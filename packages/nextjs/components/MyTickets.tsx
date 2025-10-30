@@ -20,9 +20,10 @@ interface Product {
 
 interface MyTicketsContentProps {
   products: Product[];
+  refetchFunc?: () => void;
 }
 
-export const MyTickets = ({ products }: MyTicketsContentProps) => {
+export const MyTickets = ({ products, refetchFunc }: MyTicketsContentProps) => {
   const { address: connectedAddress } = useAccount();
   const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -51,6 +52,10 @@ export const MyTickets = ({ products }: MyTicketsContentProps) => {
       });
       console.log("Purchase successful!");
       setIsDialogOpen(false);
+      // 使用票券成功後重新取得資料
+      if (refetchFunc) {
+        refetchFunc();
+      }
     } catch (error) {
       console.error("Purchase failed:", error);
     }

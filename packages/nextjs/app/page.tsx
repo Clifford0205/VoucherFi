@@ -55,7 +55,7 @@ const Home: NextPage = () => {
   const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
 
   // 檢查USDC 餘額
-  const { data: usdcBalance } = useScaffoldReadContract({
+  const { data: usdcBalance, refetch: refetchUSDCBalance } = useScaffoldReadContract({
     contractName: "mockUSDC",
     functionName: "balanceOf",
     args: [connectedAddress],
@@ -65,7 +65,7 @@ const Home: NextPage = () => {
   });
 
   // 檢查 points 餘額
-  const { data: pointsBalance } = useScaffoldReadContract({
+  const { data: pointsBalance, refetch: refetchPointsBalance } = useScaffoldReadContract({
     contractName: "SimpleVoucher1155",
     functionName: "balanceOf",
     args: [connectedAddress, 100000n],
@@ -75,7 +75,7 @@ const Home: NextPage = () => {
   });
 
   // 批量查詢所有 商品券
-  const { data: productsData } = useScaffoldReadContract({
+  const { data: myProductsData, refetch: refetchMyProductsData } = useScaffoldReadContract({
     contractName: "SimpleVoucher1155",
     functionName: "balanceOfBatch",
     args: [accounts as readonly `0x${string}`[], tokenIds],
@@ -84,12 +84,12 @@ const Home: NextPage = () => {
     },
   });
 
-  // 將 productsData 整理成 object，key 是 tokenId，value 是餘額（轉換為 Number）
+  // 將 myProductsData 整理成 object，key 是 tokenId，value 是餘額（轉換為 Number）
   // 並且過濾掉 value 為 0 的項目
-  const productsBalanceMap = productsData
+  const productsBalanceMap = myProductsData
     ? Object.fromEntries(
         tokenIds
-          .map((tokenId, index) => [tokenId.toString(), Number(productsData[index])] as [string, number])
+          .map((tokenId, index) => [tokenId.toString(), Number(myProductsData[index])] as [string, number])
           .filter(([, quantity]) => quantity > 0),
       )
     : {};
@@ -108,7 +108,7 @@ const Home: NextPage = () => {
     })
     .filter((item): item is NonNullable<typeof item> => item !== null); // 過濾掉 null 值並確保類型
 
-  console.log("productsData: ", productsData);
+  console.log("myProductsData: ", myProductsData);
   console.log("productsBalanceMap: ", productsBalanceMap);
   console.log("myProductsWithQuantity: ", myProductsWithQuantity);
 
@@ -208,15 +208,32 @@ const Home: NextPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Contents */}
           <TabsContent value="points" className="p-4 mt-0">
-            <PointMall products={mockPointProducts} />
+            <PointMall
+              products={mockPointProducts}
+              refetchFunc={() => {
+                refetchPointsBalance();
+                refetchMyProductsData();
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="myTickets" className="p-4 mt-0">
-            <MyTickets products={myProductsWithQuantity} />
+            <MyTickets
+              products={myProductsWithQuantity}
+              refetchFunc={() => {
+                refetchMyProductsData();
+              }}
+            />
           </TabsContent>
 
           <TabsContent value="mall" className="mt-0">
-            <USDCMall products={mockUSDCProducts} />
+            <USDCMall
+              products={mockUSDCProducts}
+              refetchFunc={() => {
+                refetchUSDCBalance();
+                refetchMyProductsData();
+              }}
+            />
           </TabsContent>
         </Tabs>
       )}

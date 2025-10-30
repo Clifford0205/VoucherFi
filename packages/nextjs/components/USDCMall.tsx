@@ -18,9 +18,10 @@ interface Product {
 
 interface USDCMallContentProps {
   products: Product[];
+  refetchFunc?: () => void;
 }
 
-export const USDCMall = ({ products }: USDCMallContentProps) => {
+export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
   const { address: connectedAddress } = useAccount();
   const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -48,6 +49,10 @@ export const USDCMall = ({ products }: USDCMallContentProps) => {
       });
       console.log("Purchase successful!");
       setIsDialogOpen(false);
+      // 購買成功後重新取得資料
+      if (refetchFunc) {
+        refetchFunc();
+      }
     } catch (error) {
       console.error("Purchase failed:", error);
     }
