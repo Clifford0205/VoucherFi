@@ -11,6 +11,7 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { Address } from "~~/components/scaffold-eth";
+import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 // 模擬商品數據
 const mockProducts = [
@@ -62,6 +63,19 @@ const Home: NextPage = () => {
   const [selectedProduct, setSelectedProduct] = useState<(typeof mockProducts)[0] | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
+  // 檢查會員狀態：讀取合約中的 NFT 餘額
+  const { data: memberBalance } = useScaffoldReadContract({
+    contractName: "VoucherFiToken",
+    functionName: "balanceOf",
+    args: [connectedAddress, 100n],
+    query: {
+      enabled: !!connectedAddress,
+    },
+  });
+
+  // 判斷是否為會員：餘額大於 0
+  const isMember = memberBalance !== undefined && memberBalance > 0n;
+
   // 模擬用戶數據
   const userStats = {
     points: 32,
@@ -94,28 +108,35 @@ const Home: NextPage = () => {
 
         {/* User Info Section */}
         {connectedAddress ? (
-          <div className="relative z-10 flex flex-col items-center pt-10">
-            {/* Avatar */}
-            <Avatar className="h-24 w-24 border-4 border-white/20">
-              <AvatarImage src="/api/placeholder/100/100" />
-              <AvatarFallback className="bg-neutral-600 text-2xl">
-                {connectedAddress.slice(2, 4).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
+          isMember ? (
+            <div className="relative z-10 flex flex-col items-center pt-10">
+              {/* Avatar */}
+              <Avatar className="h-24 w-24 border-4 border-white/20">
+                <AvatarImage src="/api/placeholder/100/100" />
+                <AvatarFallback className="bg-neutral-600 text-2xl">
+                  {connectedAddress.slice(2, 4).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
 
-            {/* User Name & Address */}
-            <div className="mt-3 text-center">
-              <h2 className="text-xl font-bold mb-1">會員</h2>
-              <div className="bg-black/30 rounded-full px-3 py-1 text-xs">
-                <Address address={connectedAddress} />
+              {/* User Name & Address */}
+              <div className="mt-3 text-center">
+                <h2 className="text-xl font-bold mb-1">會員</h2>
+                <div className="bg-black/30 rounded-full px-3 py-1 text-xs">
+                  <Address address={connectedAddress} />
+                </div>
               </div>
-            </div>
 
-            {/* Member Badge */}
-            <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
-              一般會員
-            </Badge>
-          </div>
+              {/* Member Badge */}
+              <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
+                一般會員
+              </Badge>
+            </div>
+          ) : (
+            <div className="relative z-10 text-center py-8">
+              <p className="text-lg mb-4">您尚未擁有會員 NFT</p>
+              <p className="text-sm text-white/70">請先取得會員資格以使用商城功能</p>
+            </div>
+          )
         ) : (
           <div className="relative z-10 text-center py-8">
             <p className="text-lg mb-4">請連接錢包以開始使用</p>
@@ -123,7 +144,7 @@ const Home: NextPage = () => {
         )}
 
         {/* Tab Navigation Cards */}
-        {connectedAddress && (
+        {connectedAddress && isMember && (
           <div className="relative z-10 grid grid-cols-4 gap-3 px-4 mt-6">
             <button
               onClick={() => setActiveTab("points")}
@@ -173,7 +194,7 @@ const Home: NextPage = () => {
       </div>
 
       {/* Tabs Content Section */}
-      {connectedAddress && (
+      {connectedAddress && isMember && (
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Contents */}
           <TabsContent value="points" className="p-4 mt-0">
