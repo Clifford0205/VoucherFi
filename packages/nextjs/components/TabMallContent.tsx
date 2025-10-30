@@ -22,7 +22,7 @@ interface TabMallContentProps {
 
 export const TabMallContent = ({ products }: TabMallContentProps) => {
   const { address: connectedAddress } = useAccount();
-  const { writeContractAsync } = useScaffoldWriteContract("VoucherFiToken");
+  const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   console.log("selectedProduct: ", selectedProduct);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -44,9 +44,8 @@ export const TabMallContent = ({ products }: TabMallContentProps) => {
 
     try {
       await writeContractAsync({
-        functionName: "mint",
-        args: [connectedAddress, BigInt(`10010${selectedProduct?.id}`), 1n],
-        value: BigInt(""),
+        functionName: "mintByUSDC",
+        args: [BigInt(selectedProduct?.id || 0), 1n],
       });
       console.log("Purchase successful!");
       setIsDialogOpen(false);

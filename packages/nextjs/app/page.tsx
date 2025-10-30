@@ -18,7 +18,7 @@ const Home: NextPage = () => {
 
   // 檢查會員狀態：讀取合約中的 NFT 餘額
   const { data: memberBalance } = useScaffoldReadContract({
-    contractName: "VoucherFiToken",
+    contractName: "SimpleVoucher1155",
     functionName: "balanceOf",
     args: [connectedAddress, 100n],
     query: {
@@ -28,6 +28,38 @@ const Home: NextPage = () => {
 
   // 判斷是否為會員：餘額大於 0
   const isMember = memberBalance !== undefined && memberBalance > 0n;
+
+  // 定義所有需要查詢的 token IDs
+  const tokenIds = [
+    100100n,
+    100101n,
+    100102n,
+    100103n,
+    100104n,
+    100200n,
+    100201n,
+    100202n,
+    100203n,
+    100204n,
+    100300n,
+    100301n,
+    100302n,
+    100303n,
+    100304n,
+  ];
+
+  // 創建相同長度的 accounts 數組，每個都是 connectedAddress
+  const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
+
+  // 批量查詢所有 token 的餘額
+  const { data: tokenBalances } = useScaffoldReadContract({
+    contractName: "SimpleVoucher1155",
+    functionName: "balanceOfBatch",
+    args: [accounts as readonly `0x${string}`[], tokenIds],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
 
   // 模擬用戶數據
   const userStats = {
