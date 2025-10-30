@@ -18,9 +18,16 @@ interface ProductDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onPurchase: () => void | Promise<void>;
+  buttonLabel?: string;
 }
 
-export const ProductDialog = ({ product, isOpen, onOpenChange, onPurchase }: ProductDialogProps) => {
+export const ProductDialog = ({
+  product,
+  isOpen,
+  onOpenChange,
+  onPurchase,
+  buttonLabel = "確定購買",
+}: ProductDialogProps) => {
   if (!product) return null;
 
   return (
@@ -60,7 +67,7 @@ export const ProductDialog = ({ product, isOpen, onOpenChange, onPurchase }: Pro
 
           {/* Purchase Button */}
           <Button onClick={onPurchase} size="lg" className="w-full text-lg">
-            確定購買
+            {buttonLabel}
           </Button>
         </div>
       </DialogContent>

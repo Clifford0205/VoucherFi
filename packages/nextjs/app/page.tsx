@@ -7,7 +7,8 @@ import { useAccount } from "wagmi";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
-import { mockPointProducts, mockProducts } from "~/lib/mockProducts";
+import { mockAllProducts, mockPointProducts, mockUSDCProducts } from "~/lib/mockProducts";
+import { MyTickets } from "~~/components/MyTickets";
 import { PointMall } from "~~/components/PointMall";
 import { USDCMall } from "~~/components/USDCMall";
 import { Address } from "~~/components/scaffold-eth";
@@ -73,7 +74,7 @@ const Home: NextPage = () => {
     },
   });
 
-  // 批量查詢所有 token 的餘額
+  // 批量查詢所有 商品券
   const { data: productsData } = useScaffoldReadContract({
     contractName: "SimpleVoucher1155",
     functionName: "balanceOfBatch",
@@ -83,12 +84,33 @@ const Home: NextPage = () => {
     },
   });
 
-  // 模擬用戶數據
-  const userStats = {
-    points: 32,
-    gifts: 2,
-    vouchers: 0,
-  };
+  // 將 productsData 整理成 object，key 是 tokenId，value 是餘額（轉換為 Number）
+  // 並且過濾掉 value 為 0 的項目
+  const productsBalanceMap = productsData
+    ? Object.fromEntries(
+        tokenIds
+          .map((tokenId, index) => [tokenId.toString(), Number(productsData[index])] as [string, number])
+          .filter(([, quantity]) => quantity > 0),
+      )
+    : {};
+
+  // 從 mockAllProducts 中找到有餘額的商品，並添加 quantity 欄位
+  const myProductsWithQuantity = Object.keys(productsBalanceMap)
+    .map(tokenId => {
+      const product = mockAllProducts.find(p => p.id.toString() === tokenId);
+      if (product) {
+        return {
+          ...product,
+          quantity: productsBalanceMap[tokenId],
+        };
+      }
+      return null;
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null); // 過濾掉 null 值並確保類型
+
+  console.log("productsData: ", productsData);
+  console.log("productsBalanceMap: ", productsBalanceMap);
+  console.log("myProductsWithQuantity: ", myProductsWithQuantity);
 
   return (
     <div className="min-h-screen bg-background">
@@ -189,20 +211,12 @@ const Home: NextPage = () => {
             <PointMall products={mockPointProducts} />
           </TabsContent>
 
-          <TabsContent value="gifts" className="p-4 mt-0">
-            <div className="text-center py-12 text-muted-foreground">
-              <p>您目前有 {userStats.gifts} 張禮物券</p>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="vouchers" className="p-4 mt-0">
-            <div className="text-center py-12 text-muted-foreground">
-              <p>商品券功能開發中...</p>
-            </div>
+          <TabsContent value="myTickets" className="p-4 mt-0">
+            <MyTickets products={myProductsWithQuantity} />
           </TabsContent>
 
           <TabsContent value="mall" className="mt-0">
-            <USDCMall products={mockProducts} />
+            <USDCMall products={mockUSDCProducts} />
           </TabsContent>
         </Tabs>
       )}

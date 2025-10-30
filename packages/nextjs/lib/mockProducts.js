@@ -1,5 +1,5 @@
 // 模擬商品數據
-export const mockProducts = [
+export const mockUSDCProducts = [
   {
     id: 100100,
     title: "炒飯",
@@ -124,3 +124,5 @@ export const mockPointProducts = [
     value: 0.005,
   },
 ];
+
+export const mockAllProducts = [...mockUSDCProducts, ...mockPointProducts];
