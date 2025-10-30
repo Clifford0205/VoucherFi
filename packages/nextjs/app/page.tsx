@@ -4,58 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
+import { ProductDialog } from "~/components/ProductDialog";
+import { TabMallContent } from "~/components/TabMallContent";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
-import { Button } from "~/components/ui/button";
-import { Card, CardContent } from "~/components/ui/card";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
+import { mockProducts } from "~/lib/mockProducts";
 import { Address } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
-
-// 模擬商品數據
-const mockProducts = [
-  {
-    id: 1,
-    title: "炒飯",
-    brand: "TGI FRIDAYS",
-    description: "消費滿1,200元免費享用沙朗牛排",
-    image: "/images/food/food1.jpg",
-    value: 0.001,
-  },
-  {
-    id: 2,
-    title: "糖醋排骨",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food2.jpg",
-    value: 0.002,
-  },
-  {
-    id: 3,
-    title: "咖哩",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food3.jpg",
-    value: 0.003,
-  },
-  {
-    id: 4,
-    title: "蕃茄咖喱",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food4.jpg",
-    value: 0.004,
-  },
-  {
-    id: 5,
-    title: "香菜咖哩",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food5.jpg",
-    value: 0.005,
-  },
-];
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
@@ -215,107 +171,19 @@ const Home: NextPage = () => {
             </div>
           </TabsContent>
 
-          <TabsContent value="mall" className="p-4 mt-0 flex flex-col items-center space-y-6">
-            {mockProducts.map(product => (
-              <Card
-                key={product.id}
-                onClick={() => handleProductClick(product)}
-                className="w-full max-w-[60%] overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-0"
-                style={{ backgroundColor: "#F4F5F8" }}
-              >
-                <CardContent className="p-0">
-                  {/* Title at the top */}
-                  <div className="px-6 pt-6 pb-3 text-center">
-                    <h3 className="text-2xl font-bold text-foreground">{product.title}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{product.brand}</p>
-                  </div>
-
-                  {/* Image and Description Container with Padding */}
-                  <div className="px-6 pb-6">
-                    <div className="flex flex-row gap-4">
-                      {/* Left: Image Section */}
-                      <div className="relative w-2/5 min-h-[200px] rounded-lg overflow-hidden">
-                        <Image
-                          src={product.image}
-                          alt={product.title}
-                          fill
-                          className="object-cover"
-                          sizes="(max-width: 768px) 100vw, 40vw"
-                        />
-                      </div>
-
-                      {/* Right: Content Section */}
-                      <div className="flex-1 flex flex-col justify-between">
-                        <div>
-                          <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-line">
-                            {product.description}
-                          </p>
-                        </div>
-
-                        {/* Price Section */}
-                        <div className="flex items-end justify-between mt-4 pt-4">
-                          <div className="text-sm text-muted-foreground">價格</div>
-                          <div className="text-right">
-                            <div className="text-3xl font-bold text-foreground">{product.value}</div>
-                            <div className="text-sm text-muted-foreground">ETH</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          <TabsContent value="mall" className="mt-0">
+            <TabMallContent products={mockProducts} onProductClick={handleProductClick} />
           </TabsContent>
         </Tabs>
       )}
 
       {/* Product Detail Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="max-w-2xl bg-white border-0">
-          {selectedProduct && (
-            <>
-              <DialogHeader>
-                <DialogTitle className="text-3xl font-bold text-center">{selectedProduct.title}</DialogTitle>
-                <DialogDescription className="text-lg text-center">{selectedProduct.brand}</DialogDescription>
-              </DialogHeader>
-              <div className="grid gap-6 py-4">
-                {/* Product Image */}
-                <div className="relative w-full h-64 rounded-lg overflow-hidden">
-                  <Image
-                    src={selectedProduct.image}
-                    alt={selectedProduct.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 50vw"
-                  />
-                </div>
-
-                {/* Product Details */}
-                <div className="space-y-4">
-                  <div>
-                    <h4 className="font-semibold text-lg mb-2">商品描述</h4>
-                    <p className="text-muted-foreground whitespace-pre-line">{selectedProduct.description}</p>
-                  </div>
-
-                  <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-                    <span className="text-lg font-semibold">價格</span>
-                    <div className="text-right">
-                      <div className="text-3xl font-bold">{selectedProduct.value}</div>
-                      <div className="text-sm text-muted-foreground">ETH</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Purchase Button */}
-                <Button onClick={handlePurchase} size="lg" className="w-full text-lg">
-                  確定購買
-                </Button>
-              </div>
-            </>
-          )}
-        </DialogContent>
-      </Dialog>
+      <ProductDialog
+        product={selectedProduct}
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        onPurchase={handlePurchase}
+      />
     </div>
   );
 };

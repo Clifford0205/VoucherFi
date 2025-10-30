@@ -1,0 +1,43 @@
+// 模擬商品數據
+export const mockProducts = [
+  {
+    id: 1,
+    title: "炒飯",
+    brand: "TGI FRIDAYS",
+    description: "消費滿1,200元免費享用沙朗牛排",
+    image: "/images/food/food1.jpg",
+    value: 0.001,
+  },
+  {
+    id: 2,
+    title: "糖醋排骨",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/food/food2.jpg",
+    value: 0.002,
+  },
+  {
+    id: 3,
+    title: "咖哩",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/food/food3.jpg",
+    value: 0.003,
+  },
+  {
+    id: 4,
+    title: "蕃茄咖喱",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/food/food4.jpg",
+    value: 0.004,
+  },
+  {
+    id: 5,
+    title: "香菜咖哩",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/food/food5.jpg",
+    value: 0.005,
+  },
+];
