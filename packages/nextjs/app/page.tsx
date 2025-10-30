@@ -4,7 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
-import { ProductDialog } from "~/components/ProductDialog";
 import { TabMallContent } from "~/components/TabMallContent";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
@@ -16,8 +15,6 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const [activeTab, setActiveTab] = useState("mall");
-  const [selectedProduct, setSelectedProduct] = useState<(typeof mockProducts)[0] | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 檢查會員狀態：讀取合約中的 NFT 餘額
   const { data: memberBalance } = useScaffoldReadContract({
@@ -37,17 +34,6 @@ const Home: NextPage = () => {
     points: 32,
     gifts: 2,
     vouchers: 0,
-  };
-
-  const handleProductClick = (product: (typeof mockProducts)[0]) => {
-    setSelectedProduct(product);
-    setIsDialogOpen(true);
-  };
-
-  const handlePurchase = () => {
-    // TODO: 實作購買邏輯
-    console.log("購買商品:", selectedProduct);
-    setIsDialogOpen(false);
   };
 
   return (
@@ -172,18 +158,10 @@ const Home: NextPage = () => {
           </TabsContent>
 
           <TabsContent value="mall" className="mt-0">
-            <TabMallContent products={mockProducts} onProductClick={handleProductClick} />
+            <TabMallContent products={mockProducts} />
           </TabsContent>
         </Tabs>
       )}
-
-      {/* Product Detail Dialog */}
-      <ProductDialog
-        product={selectedProduct}
-        isOpen={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        onPurchase={handlePurchase}
-      />
     </div>
   );
 };

@@ -17,7 +17,7 @@ interface ProductDialogProps {
   product: Product | null;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  onPurchase: () => void;
+  onPurchase: () => void | Promise<void>;
 }
 
 export const ProductDialog = ({ product, isOpen, onOpenChange, onPurchase }: ProductDialogProps) => {
