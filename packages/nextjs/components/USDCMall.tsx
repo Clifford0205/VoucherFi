@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { useAccount } from "wagmi";
+import { parseUnits } from "viem";
+import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 interface Product {
   id: number;
@@ -23,9 +25,26 @@ interface USDCMallContentProps {
 
 export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
   const { address: connectedAddress } = useAccount();
-  const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
+  const publicClient = usePublicClient();
+  const { writeContractAsync: writeVoucherContract } = useScaffoldWriteContract("SimpleVoucher1155");
+  const { writeContractAsync: writeUSDCContract } = useScaffoldWriteContract("mockUSDC");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // 獲取 SimpleVoucher1155 合約地址（作為 spender）
+  const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
+  console.log("voucherContractInfo: ", voucherContractInfo);
+  const { data: usdcContractInfo } = useDeployedContractInfo("mockUSDC");
+
+  // 讀取當前的 USDC allowance
+  const { data: currentAllowance } = useScaffoldReadContract({
+    contractName: "mockUSDC",
+    functionName: "allowance",
+    args: [connectedAddress, voucherContractInfo?.address],
+    query: {
+      enabled: !!connectedAddress && !!voucherContractInfo?.address,
+    },
+  });
 
   // 處理商品點擊
   const handleProductClick = (product: Product) => {
@@ -40,15 +59,64 @@ export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
       return;
     }
 
+    if (!selectedProduct) {
+      console.error("No product selected");
+      return;
+    }
+
+    if (!voucherContractInfo?.address) {
+      console.error("Contract address not found");
+      return;
+    }
+
     console.log("購買商品:", selectedProduct);
 
     try {
-      await writeContractAsync({
+      // 計算需要的 USDC 金額（USDC 有 6 位小數）
+      const requiredAmount = parseUnits(selectedProduct.value.toString(), 6);
+
+      console.log("Required amount:", requiredAmount);
+      console.log("Current allowance:", currentAllowance);
+
+      // 檢查 allowance 是否足夠
+      if (!currentAllowance || currentAllowance < requiredAmount) {
+        console.log("Allowance insufficient, approving...");
+
+        // 先 approve（授權足夠的額度，這裡授權需要的金額）
+        await writeUSDCContract({
+          functionName: "approve",
+          args: [voucherContractInfo.address, requiredAmount],
+        });
+
+        console.log("Approve transaction confirmed!");
+
+        // approve 交易已確認，現在從鏈上重新讀取 allowance 來驗證
+        if (publicClient && usdcContractInfo?.address) {
+          const newAllowance = (await publicClient.readContract({
+            address: usdcContractInfo.address,
+            abi: usdcContractInfo.abi,
+            functionName: "allowance",
+            args: [connectedAddress, voucherContractInfo.address],
+          })) as bigint;
+
+          console.log("New allowance from chain:", newAllowance);
+
+          // 驗證 allowance 是否真的足夠
+          if (newAllowance < requiredAmount) {
+            throw new Error("Allowance verification failed. Please try again.");
+          }
+        }
+      }
+
+      // 執行購買
+      await writeVoucherContract({
         functionName: "mintByUSDC",
-        args: [BigInt(selectedProduct?.id || 0), 1n],
+        args: [BigInt(selectedProduct.id), 1n],
       });
+
       console.log("Purchase successful!");
       setIsDialogOpen(false);
+
       // 購買成功後重新取得資料
       if (refetchFunc) {
         refetchFunc();
