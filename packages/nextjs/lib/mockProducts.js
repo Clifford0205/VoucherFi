@@ -81,3 +81,46 @@ export const mockProducts = [
     value: 0.005,
   },
 ];
+
+export const mockPointProducts = [
+  {
+    id: 100200,
+    title: "糖果1",
+    brand: "TGI FRIDAYS",
+    description: "消費滿1,200元免費享用沙朗牛排",
+    image: "/images/candy/candy1.jpg",
+    value: 0.001,
+  },
+  {
+    id: 100201,
+    title: "糖果2",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/candy/candy2.jpg",
+    value: 0.002,
+  },
+  {
+    id: 100202,
+    title: "糖果3",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/candy/candy3.jpg",
+    value: 0.003,
+  },
+  {
+    id: 100203,
+    title: "糖果4",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/candy/candy4.jpg",
+    value: 0.004,
+  },
+  {
+    id: 100204,
+    title: "糖果5",
+    brand: "TEXAS ROADHOUSE",
+    description: "消費滿$1,200立即兌換",
+    image: "/images/candy/candy5.png",
+    value: 0.005,
+  },
+];

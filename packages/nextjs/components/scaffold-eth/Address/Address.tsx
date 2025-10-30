@@ -73,6 +73,7 @@ type AddressProps = {
   format?: "short" | "long";
   size?: "xs" | "sm" | "base" | "lg" | "xl" | "2xl" | "3xl";
   onlyEnsOrAddress?: boolean;
+  isBlockieShow?: boolean;
 };
 
 export const Address = ({
@@ -81,6 +82,7 @@ export const Address = ({
   format,
   size = "base",
   onlyEnsOrAddress = false,
+  isBlockieShow = true,
 }: AddressProps) => {
   const checkSumAddress = address ? getAddress(address) : undefined;
 
@@ -145,11 +147,13 @@ export const Address = ({
   return (
     <div className="flex items-center shrink-0">
       <div className="shrink-0">
-        <BlockieAvatar
-          address={checkSumAddress}
-          ensImage={ensAvatar}
-          size={(blockieSizeMap[blockieSize] * 24) / blockieSizeMap["base"]}
-        />
+        {isBlockieShow && (
+          <BlockieAvatar
+            address={checkSumAddress}
+            ensImage={ensAvatar}
+            size={(blockieSizeMap[blockieSize] * 24) / blockieSizeMap["base"]}
+          />
+        )}
       </div>
       <div className="flex flex-col">
         {showSkeleton &&

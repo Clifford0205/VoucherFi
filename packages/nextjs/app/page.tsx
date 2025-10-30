@@ -4,12 +4,14 @@ import { useState } from "react";
 import Image from "next/image";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
-import { TabMallContent } from "~/components/TabMallContent";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
-import { mockProducts } from "~/lib/mockProducts";
+import { mockPointProducts, mockProducts } from "~/lib/mockProducts";
+import { PointMall } from "~~/components/PointMall";
+import { USDCMall } from "~~/components/USDCMall";
 import { Address } from "~~/components/scaffold-eth";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
@@ -51,8 +53,28 @@ const Home: NextPage = () => {
   // 創建相同長度的 accounts 數組，每個都是 connectedAddress
   const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
 
+  // 檢查USDC 餘額
+  const { data: usdcBalance } = useScaffoldReadContract({
+    contractName: "mockUSDC",
+    functionName: "balanceOf",
+    args: [connectedAddress],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
+
+  // 檢查 points 餘額
+  const { data: pointsBalance } = useScaffoldReadContract({
+    contractName: "SimpleVoucher1155",
+    functionName: "balanceOf",
+    args: [connectedAddress, 100000n],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
+
   // 批量查詢所有 token 的餘額
-  const { data: tokenBalances } = useScaffoldReadContract({
+  const { data: productsData } = useScaffoldReadContract({
     contractName: "SimpleVoucher1155",
     functionName: "balanceOfBatch",
     args: [accounts as readonly `0x${string}`[], tokenIds],
@@ -86,24 +108,26 @@ const Home: NextPage = () => {
             <div className="relative z-10 flex flex-col items-center pt-10">
               {/* Avatar */}
               <Avatar className="h-24 w-24 border-4 border-white/20">
-                <AvatarImage src="/api/placeholder/100/100" />
-                <AvatarFallback className="bg-neutral-600 text-2xl">
+                {/* <AvatarImage src="/api/placeholder/100/100" /> */}
+                {/* <AvatarFallback className="bg-neutral-600 text-2xl">
                   {connectedAddress.slice(2, 4).toUpperCase()}
-                </AvatarFallback>
+                </AvatarFallback> */}
+                <BlockieAvatar address={connectedAddress} size={100} />
               </Avatar>
 
               {/* User Name & Address */}
               <div className="mt-3 text-center">
-                <h2 className="text-xl font-bold mb-1">會員</h2>
                 <div className="bg-black/30 rounded-full px-3 py-1 text-xs">
-                  <Address address={connectedAddress} />
+                  <Address address={connectedAddress} isBlockieShow={false} />
                 </div>
               </div>
+              <div>USDC: {usdcBalance}</div>
+              <div>Points: {pointsBalance}</div>
 
               {/* Member Badge */}
-              <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
+              {/* <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
                 一般會員
-              </Badge>
+              </Badge> */}
             </div>
           ) : (
             <div className="relative z-10 text-center py-8">
@@ -119,33 +143,23 @@ const Home: NextPage = () => {
 
         {/* Tab Navigation Cards */}
         {connectedAddress && isMember && (
-          <div className="relative z-10 grid grid-cols-4 gap-3 px-4 mt-6">
+          <div className="relative z-10 grid grid-cols-3 gap-3 px-4 mt-6">
             <button
               onClick={() => setActiveTab("points")}
               className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
                 activeTab === "points" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">{userStats.points}</div>
-              <div className="text-xs mt-1 text-white/80">點數</div>
+              <div className="text-3xl font-bold text-white">點數商城</div>
             </button>
+
             <button
-              onClick={() => setActiveTab("gifts")}
+              onClick={() => setActiveTab("myTickets")}
               className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
-                activeTab === "gifts" ? "ring-2 ring-white/50 bg-white/20" : ""
+                activeTab === "myTickets" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">{userStats.gifts}</div>
-              <div className="text-xs mt-1 text-white/80">禮物券</div>
-            </button>
-            <button
-              onClick={() => setActiveTab("vouchers")}
-              className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
-                activeTab === "vouchers" ? "ring-2 ring-white/50 bg-white/20" : ""
-              }`}
-            >
-              <div className="text-3xl font-bold text-white">{userStats.vouchers}</div>
-              <div className="text-xs mt-1 text-white/80">商品券</div>
+              <div className="text-3xl font-bold text-white">我的票券</div>
             </button>
             <button
               onClick={() => setActiveTab("mall")}
@@ -172,9 +186,7 @@ const Home: NextPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Contents */}
           <TabsContent value="points" className="p-4 mt-0">
-            <div className="text-center py-12 text-muted-foreground">
-              <p>點數功能開發中...</p>
-            </div>
+            <PointMall products={mockPointProducts} />
           </TabsContent>
 
           <TabsContent value="gifts" className="p-4 mt-0">
@@ -190,7 +202,7 @@ const Home: NextPage = () => {
           </TabsContent>
 
           <TabsContent value="mall" className="mt-0">
-            <TabMallContent products={mockProducts} />
+            <USDCMall products={mockProducts} />
           </TabsContent>
         </Tabs>
       )}

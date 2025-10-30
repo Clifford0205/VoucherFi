@@ -16,15 +16,14 @@ interface Product {
   value: number;
 }
 
-interface TabMallContentProps {
+interface USDCMallContentProps {
   products: Product[];
 }
 
-export const TabMallContent = ({ products }: TabMallContentProps) => {
+export const USDCMall = ({ products }: USDCMallContentProps) => {
   const { address: connectedAddress } = useAccount();
   const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  console.log("selectedProduct: ", selectedProduct);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   // 處理商品點擊
