@@ -1,23 +1,33 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
-import { mockAllProducts, mockPointProducts, mockUSDCProducts } from "~/lib/mockProducts";
+import { mockAllProducts, mockPointProducts, mockProducts, mockUSDCProducts } from "~/lib/mockProducts";
 import { MyTickets } from "~~/components/MyTickets";
 import { PointMall } from "~~/components/PointMall";
 import { USDCMall } from "~~/components/USDCMall";
 import { Address } from "~~/components/scaffold-eth";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+
+const tokenIds = mockProducts.map(product => BigInt(product.id));
+console.log("tokenIds: ", tokenIds);
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
+  const publicClient = usePublicClient();
   const [activeTab, setActiveTab] = useState("mall");
+  const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
+  console.log("productsWithPrices: ", productsWithPrices);
+
+  // 獲取合約信息
+  const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
 
   // 檢查會員狀態：讀取合約中的 NFT 餘額
   const { data: memberBalance } = useScaffoldReadContract({
@@ -31,25 +41,6 @@ const Home: NextPage = () => {
 
   // 判斷是否為會員：餘額大於 0
   const isMember = memberBalance !== undefined && memberBalance > 0n;
-
-  // 定義所有需要查詢的 token IDs
-  const tokenIds = [
-    100100n,
-    100101n,
-    100102n,
-    100103n,
-    100104n,
-    100200n,
-    100201n,
-    100202n,
-    100203n,
-    100204n,
-    100300n,
-    100301n,
-    100302n,
-    100303n,
-    100304n,
-  ];
 
   // 創建相同長度的 accounts 數組，每個都是 connectedAddress
   const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
@@ -111,6 +102,56 @@ const Home: NextPage = () => {
   console.log("myProductsData: ", myProductsData);
   console.log("productsBalanceMap: ", productsBalanceMap);
   console.log("myProductsWithQuantity: ", myProductsWithQuantity);
+
+  // 使用 useEffect 批量查詢 pointsCost 和 priceUSDC
+  useEffect(() => {
+    const fetchPrices = async () => {
+      if (!publicClient || !voucherContractInfo?.address || !isMember) return;
+
+      try {
+        // 準備 multicall 合約調用
+        const priceUSDCCalls = tokenIds.map(tokenId => ({
+          address: voucherContractInfo.address,
+          abi: voucherContractInfo.abi,
+          functionName: "priceUSDC",
+          args: [tokenId],
+        }));
+
+        const pointsCostCalls = tokenIds.map(tokenId => ({
+          address: voucherContractInfo.address,
+          abi: voucherContractInfo.abi,
+          functionName: "pointsCost",
+          args: [tokenId],
+        }));
+
+        // 執行批量查詢
+        const priceUSDCResults = await publicClient.multicall({
+          contracts: priceUSDCCalls as any,
+        });
+
+        const pointsCostResults = await publicClient.multicall({
+          contracts: pointsCostCalls as any,
+        });
+
+        console.log("priceUSDCResults:", priceUSDCResults);
+        console.log("pointsCostResults:", pointsCostResults);
+
+        // 將價格數據合併到 mockProducts
+        const updatedProducts = mockProducts.map((product, index) => ({
+          ...product,
+          priceUSDC: priceUSDCResults[index].status === "success" ? Number(priceUSDCResults[index].result) : 0,
+          pointsCost: pointsCostResults[index].status === "success" ? Number(pointsCostResults[index].result) : 0,
+        }));
+
+        setProductsWithPrices(updatedProducts);
+        console.log("updatedProducts:", updatedProducts);
+      } catch (error) {
+        console.error("Failed to fetch prices:", error);
+      }
+    };
+
+    fetchPrices();
+  }, [publicClient, voucherContractInfo, isMember, tokenIds]);
 
   return (
     <div className="min-h-screen bg-background">

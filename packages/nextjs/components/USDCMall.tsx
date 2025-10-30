@@ -33,7 +33,6 @@ export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
 
   // 獲取 SimpleVoucher1155 合約地址（作為 spender）
   const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
-  console.log("voucherContractInfo: ", voucherContractInfo);
   const { data: usdcContractInfo } = useDeployedContractInfo("mockUSDC");
 
   // 讀取當前的 USDC allowance
