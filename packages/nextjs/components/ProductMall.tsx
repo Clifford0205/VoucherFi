@@ -235,7 +235,9 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
         {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
           <div key={category}>
             {/* 分類標題 */}
-            <h2 className="text-2xl font-bold mb-4 px-2 text-foreground ">{category}</h2>
+            <h2 className="text-2xl font-bold mb-4 px-2 text-foreground border-b-2 border-foreground/20 pb-1">
+              {category}
+            </h2>
 
             {/* 該分類的產品網格 */}
             <div className="grid grid-cols-2 gap-4">
