@@ -307,6 +307,7 @@ const Home: NextPage = () => {
               products={productsWithPrices}
               refetchFunc={() => {
                 refetchUSDCBalance();
+                refetchPointsBalance();
                 refetchMyProductsData();
               }}
             />

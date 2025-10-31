@@ -120,6 +120,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
       console.log("Action successful!");
       setIsDialogOpen(false);
 
+      // 等待新區塊產生後再重新取得資料
       // 成功後重新取得資料
       if (refetchFunc) {
         refetchFunc();
