@@ -1,70 +1,319 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import type { NextPage } from "next";
-import { useAccount } from "wagmi";
-import { BugAntIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { useAccount, usePublicClient } from "wagmi";
+import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
+import { Badge } from "~/components/ui/badge";
+import { Tabs, TabsContent } from "~/components/ui/tabs";
+import { mockProducts } from "~/lib/mockProducts";
+import { ProductMall } from "~~/components/ProductMall";
 import { Address } from "~~/components/scaffold-eth";
+import { BlockieAvatar } from "~~/components/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
+
+const tokenIds = mockProducts.map(product => BigInt(product.id));
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
+  const publicClient = usePublicClient();
+  const [activeTab, setActiveTab] = useState("myTickets");
+  const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [hasAttemptedRegister, setHasAttemptedRegister] = useState(false);
+
+  // 獲取合約信息
+  const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
+
+  // 準備 register 寫入函數
+  const { writeContractAsync: registerContract } = useScaffoldWriteContract("SimpleVoucher1155");
+
+  // 檢查會員狀態：讀取合約中的 NFT 餘額
+  const { data: memberBalance, refetch: refetchMemberBalance } = useScaffoldReadContract({
+    contractName: "SimpleVoucher1155",
+    functionName: "balanceOf",
+    args: [connectedAddress, 100n],
+    query: {
+      enabled: !!connectedAddress,
+    },
+  });
+
+  // 判斷是否為會員：餘額大於 0
+  const isMember = useMemo(() => memberBalance !== undefined && memberBalance > 0n, [memberBalance]);
+
+  // 要是 isMember false 則去打 SimpleVoucher1155 的 register ABI
+  useEffect(() => {
+    const handleRegister = async () => {
+      // 條件檢查：已連接錢包、不是會員、且未在註冊中、且未嘗試過註冊
+      if (!connectedAddress || isMember || isRegistering || hasAttemptedRegister || memberBalance === undefined) {
+        return;
+      }
+
+      try {
+        setIsRegistering(true);
+        setHasAttemptedRegister(true); // 標記已嘗試註冊
+        console.log("開始註冊會員...");
+
+        // 調用 register 函數
+        await registerContract({
+          functionName: "register",
+        });
+
+        console.log("會員註冊成功！");
+
+        // 註冊成功後重新查詢會員狀態
+        await refetchMemberBalance();
+
+        // 等待一小段時間，讓區塊鏈確認交易和狀態更新
+        setTimeout(() => {
+          setIsRegistering(false);
+        }, 2000);
+      } catch (error) {
+        console.error("會員註冊失敗:", error);
+        setIsRegistering(false);
+        // 註冊失敗不重置 hasAttemptedRegister，避免重複嘗試
+      }
+    };
+
+    handleRegister();
+  }, [
+    connectedAddress,
+    isMember,
+    memberBalance,
+    isRegistering,
+    hasAttemptedRegister,
+    registerContract,
+    refetchMemberBalance,
+  ]);
+
+  // 創建相同長度的 accounts 數組，每個都是 connectedAddress
+  const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
+
+  // 檢查USDC 餘額
+  const { data: usdcBalance, refetch: refetchUSDCBalance } = useScaffoldReadContract({
+    contractName: "mockUSDC",
+    functionName: "balanceOf",
+    args: [connectedAddress],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
+
+  // 檢查 points 餘額
+  const { data: pointsBalance, refetch: refetchPointsBalance } = useScaffoldReadContract({
+    contractName: "SimpleVoucher1155",
+    functionName: "balanceOf",
+    args: [connectedAddress, 100000n],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
+
+  // 批量查詢所有 商品券
+  const { data: myProductsData, refetch: refetchMyProductsData } = useScaffoldReadContract({
+    contractName: "SimpleVoucher1155",
+    functionName: "balanceOfBatch",
+    args: [accounts as readonly `0x${string}`[], tokenIds],
+    query: {
+      enabled: isMember && !!connectedAddress,
+    },
+  });
+
+  // 將 myProductsData 整理成 object，key 是 tokenId，value 是餘額（轉換為 Number）
+  // 並且過濾掉 value 為 0 的項目
+  const productsBalanceMap = myProductsData
+    ? Object.fromEntries(
+        tokenIds
+          .map((tokenId, index) => [tokenId.toString(), Number(myProductsData[index])] as [string, number])
+          .filter(([, quantity]) => quantity > 0),
+      )
+    : {};
+
+  // 從 mockProducts 中找到有餘額的商品，並添加 quantity 欄位
+  const myProductsWithQuantity = Object.keys(productsBalanceMap)
+    .map(tokenId => {
+      const product = mockProducts.find(p => p.id.toString() === tokenId);
+      if (product) {
+        return {
+          ...product,
+          quantity: productsBalanceMap[tokenId],
+        };
+      }
+      return null;
+    })
+    .filter((item): item is NonNullable<typeof item> => item !== null); // 過濾掉 null 值並確保類型
+
+  // 使用 useEffect 批量查詢 pointsCost 和 priceUSDC
+  useEffect(() => {
+    const fetchPrices = async () => {
+      if (!publicClient || !voucherContractInfo?.address || !isMember) return;
+
+      try {
+        // 準備 multicall 合約調用
+        const priceUSDCCalls = tokenIds.map(tokenId => ({
+          address: voucherContractInfo.address,
+          abi: voucherContractInfo.abi,
+          functionName: "priceUSDC",
+          args: [tokenId],
+        }));
+
+        const pointsCostCalls = tokenIds.map(tokenId => ({
+          address: voucherContractInfo.address,
+          abi: voucherContractInfo.abi,
+          functionName: "pointsCost",
+          args: [tokenId],
+        }));
+
+        // 執行批量查詢
+        const priceUSDCResults = await publicClient.multicall({
+          contracts: priceUSDCCalls as any,
+        });
+
+        const pointsCostResults = await publicClient.multicall({
+          contracts: pointsCostCalls as any,
+        });
+
+        // 將價格數據合併到 mockProducts
+        const updatedProducts = mockProducts.map((product, index) => ({
+          ...product,
+          priceUSDC: priceUSDCResults[index].status === "success" ? Number(priceUSDCResults[index].result) : 0,
+          pointsCost: pointsCostResults[index].status === "success" ? Number(pointsCostResults[index].result) : 0,
+        }));
+
+        setProductsWithPrices(updatedProducts);
+      } catch (error) {
+        console.error("Failed to fetch prices:", error);
+      }
+    };
+
+    fetchPrices();
+  }, [publicClient, voucherContractInfo, isMember]);
 
   return (
-    <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold">Scaffold-ETH 2</span>
-          </h1>
-          <div className="flex justify-center items-center space-x-2 flex-col">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-          <p className="text-center text-lg">
-            Get started by editing{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/nextjs/app/page.tsx
-            </code>
-          </p>
-          <p className="text-center text-lg">
-            Edit your smart contract{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              YourContract.sol
-            </code>{" "}
-            in{" "}
-            <code className="italic bg-base-300 text-base font-bold max-w-full break-words break-all inline-block">
-              packages/hardhat/contracts
-            </code>
-          </p>
+    <div className="min-h-screen bg-background">
+      {/* Header Section */}
+      <div className="relative  text-white pb-6 overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image src="/images/banner.jpg" alt="Banner Background" fill className="object-cover opacity-30" priority />
         </div>
 
-        <div className="grow bg-base-300 w-full mt-16 px-8 py-12">
-          <div className="flex justify-center items-center gap-12 flex-col md:flex-row">
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <BugAntIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Tinker with your smart contract using the{" "}
-                <Link href="/debug" passHref className="link">
-                  Debug Contracts
-                </Link>{" "}
-                tab.
-              </p>
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 z-0 bg-gradient-to-b from-black/50 to-black/70" />
+
+        {/* User Info Section */}
+        {connectedAddress ? (
+          isMember ? (
+            <div className="relative z-10 flex flex-col items-center pt-10">
+              {/* Avatar */}
+              <Avatar className="h-24 w-24 border-4 border-white/20">
+                {/* <AvatarImage src="/api/placeholder/100/100" /> */}
+                {/* <AvatarFallback className="bg-neutral-600 text-2xl">
+                  {connectedAddress.slice(2, 4).toUpperCase()}
+                </AvatarFallback> */}
+                <BlockieAvatar address={connectedAddress} size={100} />
+              </Avatar>
+
+              {/* User Name & Address */}
+              <div className="mt-3 text-center">
+                <div className="bg-black/30 rounded-full px-3 py-1 text-xs">
+                  <Address address={connectedAddress} isBlockieShow={false} />
+                </div>
+              </div>
+              <div className="text-lg font-bold mt-2">
+                USDC: {usdcBalance ? (Number(usdcBalance) / 1000000).toFixed(2) : "0.00"}
+              </div>
+              <div className="text-lg font-bold mt-2">Points: {pointsBalance}</div>
+
+              {/* Member Badge */}
+              {/* <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
+                一般會員
+              </Badge> */}
             </div>
-            <div className="flex flex-col bg-base-100 px-10 py-10 text-center items-center max-w-xs rounded-3xl">
-              <MagnifyingGlassIcon className="h-8 w-8 fill-secondary" />
-              <p>
-                Explore your local transactions with the{" "}
-                <Link href="/blockexplorer" passHref className="link">
-                  Block Explorer
-                </Link>{" "}
-                tab.
-              </p>
+          ) : (
+            <div className="relative z-10 text-center py-8">
+              <p className="text-lg mb-4">您尚未擁有會員 NFT</p>
+              <p className="text-sm text-white/70">請先取得會員資格以使用商城功能</p>
             </div>
+          )
+        ) : (
+          <div className="relative z-10 text-center py-8">
+            <p className="text-lg mb-4">請連接錢包以開始使用</p>
           </div>
-        </div>
+        )}
+
+        {/* Tab Navigation Cards */}
+        {connectedAddress && isMember && (
+          <div className="relative z-10 grid grid-cols-3 gap-3 px-4 mt-6">
+            <button
+              onClick={() => setActiveTab("points")}
+              className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
+                activeTab === "points" ? "ring-2 ring-white/50 bg-white/20" : ""
+              }`}
+            >
+              <div className="text-lg font-bold text-white">點數兌換</div>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("myTickets")}
+              className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
+                activeTab === "myTickets" ? "ring-2 ring-white/50 bg-white/20" : ""
+              }`}
+            >
+              <div className="text-lg font-bold text-white">我的票券</div>
+            </button>
+            <button
+              onClick={() => setActiveTab("mall")}
+              className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
+                activeTab === "mall" ? "ring-2 ring-white/50 bg-white/20" : ""
+              }`}
+            >
+              <div className="text-lg font-bold text-white">商城</div>
+            </button>
+          </div>
+        )}
       </div>
-    </>
+
+      {/* Tabs Content Section */}
+      {connectedAddress && isMember && (
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          {/* Tab Contents */}
+          <TabsContent value="points" className="p-4 mt-0">
+            <ProductMall
+              type="points"
+              products={productsWithPrices}
+              refetchFunc={() => {
+                refetchPointsBalance();
+                refetchMyProductsData();
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="myTickets" className="p-4 mt-0">
+            <ProductMall
+              type="tickets"
+              products={myProductsWithQuantity}
+              refetchFunc={() => {
+                refetchMyProductsData();
+              }}
+            />
+          </TabsContent>
+
+          <TabsContent value="mall" className="p-4 mt-0">
+            <ProductMall
+              type="usdc"
+              products={productsWithPrices}
+              refetchFunc={() => {
+                refetchUSDCBalance();
+                refetchMyProductsData();
+              }}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
+    </div>
   );
 };
 
