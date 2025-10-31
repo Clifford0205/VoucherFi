@@ -8,9 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { mockAllProducts, mockPointProducts, mockProducts, mockUSDCProducts } from "~/lib/mockProducts";
-import { MyTickets } from "~~/components/MyTickets";
-import { PointMall } from "~~/components/PointMall";
-import { USDCMall } from "~~/components/USDCMall";
+import { ProductMall } from "~~/components/ProductMall";
 import { Address } from "~~/components/scaffold-eth";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
@@ -240,7 +238,8 @@ const Home: NextPage = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           {/* Tab Contents */}
           <TabsContent value="points" className="p-4 mt-0">
-            <PointMall
+            <ProductMall
+              type="points"
               products={productsWithPrices}
               refetchFunc={() => {
                 refetchPointsBalance();
@@ -250,7 +249,8 @@ const Home: NextPage = () => {
           </TabsContent>
 
           <TabsContent value="myTickets" className="p-4 mt-0">
-            <MyTickets
+            <ProductMall
+              type="tickets"
               products={myProductsWithQuantity}
               refetchFunc={() => {
                 refetchMyProductsData();
@@ -259,7 +259,8 @@ const Home: NextPage = () => {
           </TabsContent>
 
           <TabsContent value="mall" className="mt-0">
-            <USDCMall
+            <ProductMall
+              type="usdc"
               products={productsWithPrices}
               refetchFunc={() => {
                 refetchUSDCBalance();
