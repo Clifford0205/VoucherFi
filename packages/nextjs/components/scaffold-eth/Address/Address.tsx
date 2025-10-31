@@ -156,7 +156,7 @@ export const Address = ({
         )}
       </div>
       <div className="flex flex-col">
-        {showSkeleton &&
+        {/* {showSkeleton &&
           (isEnsNameLoading ? (
             <div className={`ml-1.5 skeleton rounded-lg font-bold ${textSizeMap[ensSize]}`}>
               <span className="invisible">{shortAddress}</span>
@@ -170,7 +170,15 @@ export const Address = ({
                 {ens}
               </AddressLinkWrapper>
             </span>
-          ))}
+          ))} */}
+        <span className={`ml-1.5 ${textSizeMap[ensSize]} font-bold`}>
+          <AddressLinkWrapper
+            disableAddressLink={disableAddressLink}
+            blockExplorerAddressLink={blockExplorerAddressLink}
+          >
+            {ens}
+          </AddressLinkWrapper>
+        </span>
         <div className="flex">
           <span className={`ml-1.5 ${textSizeMap[addressSize]} font-normal`}>
             <AddressLinkWrapper
