@@ -135,8 +135,8 @@
   }
 }
 
-/* Shadcn dark mode variables */
-@media (prefers-color-scheme: dark) {
+/* Shadcn dark mode variables - DISABLED to force light theme */
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
@@ -163,7 +163,7 @@
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
   }
-}
+} */
 
 [data-theme="dark"] {
   --background: 0 0% 3.9%;
