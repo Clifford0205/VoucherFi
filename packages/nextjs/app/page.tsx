@@ -147,7 +147,7 @@ const Home: NextPage = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header Section */}
-      <div className="relative bg-gradient-to-b from-neutral-900 to-neutral-800 text-white pb-6 overflow-hidden">
+      <div className="relative  text-white pb-6 overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <Image src="/images/banner.jpg" alt="Banner Background" fill className="object-cover opacity-30" priority />
