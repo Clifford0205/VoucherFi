@@ -133,6 +133,7 @@ export const MyTickets = ({ products, refetchFunc }: MyTicketsContentProps) => {
         onOpenChange={setIsDialogOpen}
         onPurchase={handleUseTicket}
         buttonLabel="使用票券"
+        type="use"
       />
     </>
   );

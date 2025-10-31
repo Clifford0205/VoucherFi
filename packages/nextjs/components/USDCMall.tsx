@@ -74,10 +74,7 @@ export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
 
     try {
       // 計算需要的 USDC 金額（USDC 有 6 位小數）
-      const requiredAmount = parseUnits(selectedProduct.value.toString(), 6);
-
-      console.log("Required amount:", requiredAmount);
-      console.log("Current allowance:", currentAllowance);
+      const requiredAmount = parseUnits(selectedProduct.priceUSDC?.toString() || "0", 6);
 
       // 檢查 allowance 是否足夠
       if (!currentAllowance || currentAllowance < requiredAmount) {
@@ -169,8 +166,10 @@ export const USDCMall = ({ products, refetchFunc }: USDCMallContentProps) => {
                     <div className="flex items-end justify-between mt-4 pt-4">
                       <div className="text-sm text-muted-foreground">價格</div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-foreground">{product.priceUSDC}</div>
-                        <div className="text-sm text-muted-foreground">ETH</div>
+                        <div className="text-3xl font-bold text-foreground">
+                          {product.priceUSDC !== undefined ? (product.priceUSDC / 1000000).toFixed(2) : "0"}
+                        </div>
+                        <div className="text-sm text-muted-foreground">USDC</div>
                       </div>
                     </div>
                   </div>

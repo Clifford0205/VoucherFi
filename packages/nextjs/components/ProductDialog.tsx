@@ -10,7 +10,8 @@ interface Product {
   brand: string;
   description: string;
   image: string;
-  value: number;
+  priceUSDC?: number;
+  pointsCost?: number;
 }
 
 interface ProductDialogProps {
@@ -19,6 +20,7 @@ interface ProductDialogProps {
   onOpenChange: (open: boolean) => void;
   onPurchase: () => void | Promise<void>;
   buttonLabel?: string;
+  type?: "points" | "usdc" | "use";
 }
 
 export const ProductDialog = ({
@@ -27,6 +29,7 @@ export const ProductDialog = ({
   onOpenChange,
   onPurchase,
   buttonLabel = "確定購買",
+  type = "usdc",
 }: ProductDialogProps) => {
   if (!product) return null;
 
@@ -57,11 +60,32 @@ export const ProductDialog = ({
             </div>
 
             <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-              <span className="text-lg font-semibold">價格</span>
-              <div className="text-right">
-                <div className="text-3xl font-bold">{product.value}</div>
-                <div className="text-sm text-muted-foreground">ETH</div>
-              </div>
+              {type === "points" && (
+                <>
+                  <span className="text-lg font-semibold">點數</span>
+                  <div className="text-right">
+                    <>
+                      <div className="text-3xl font-bold">
+                        {product.pointsCost !== undefined ? product.pointsCost : "0"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">Point</div>
+                    </>
+                  </div>
+                </>
+              )}
+              {type === "usdc" && (
+                <>
+                  <span className="text-lg font-semibold">價格</span>
+                  <div className="text-right">
+                    <>
+                      <div className="text-3xl font-bold">
+                        {product.priceUSDC !== undefined ? (product.priceUSDC / 1000000).toFixed(2) : "0"}
+                      </div>
+                      <div className="text-sm text-muted-foreground">USDC</div>
+                    </>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 

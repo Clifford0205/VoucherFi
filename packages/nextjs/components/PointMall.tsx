@@ -100,10 +100,10 @@ export const PointMall = ({ products, refetchFunc }: PointMallContentProps) => {
 
                     {/* Price Section */}
                     <div className="flex items-end justify-between mt-4 pt-4">
-                      <div className="text-sm text-muted-foreground">價格</div>
+                      <div className="text-sm text-muted-foreground">點數</div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-foreground">{product.value}</div>
-                        <div className="text-sm text-muted-foreground">ETH</div>
+                        <div className="text-3xl font-bold text-foreground">{product.pointsCost}</div>
+                        <div className="text-sm text-muted-foreground">Point</div>
                       </div>
                     </div>
                   </div>
@@ -120,6 +120,8 @@ export const PointMall = ({ products, refetchFunc }: PointMallContentProps) => {
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         onPurchase={handlePurchase}
+        buttonLabel="使用點數兌換"
+        type="points"
       />
     </>
   );

@@ -17,7 +17,6 @@ import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 const tokenIds = mockProducts.map(product => BigInt(product.id));
-console.log("tokenIds: ", tokenIds);
 
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
@@ -99,10 +98,6 @@ const Home: NextPage = () => {
     })
     .filter((item): item is NonNullable<typeof item> => item !== null); // 過濾掉 null 值並確保類型
 
-  console.log("myProductsData: ", myProductsData);
-  console.log("productsBalanceMap: ", productsBalanceMap);
-  console.log("myProductsWithQuantity: ", myProductsWithQuantity);
-
   // 使用 useEffect 批量查詢 pointsCost 和 priceUSDC
   useEffect(() => {
     const fetchPrices = async () => {
@@ -133,9 +128,6 @@ const Home: NextPage = () => {
           contracts: pointsCostCalls as any,
         });
 
-        console.log("priceUSDCResults:", priceUSDCResults);
-        console.log("pointsCostResults:", pointsCostResults);
-
         // 將價格數據合併到 mockProducts
         const updatedProducts = mockProducts.map((product, index) => ({
           ...product,
@@ -144,14 +136,13 @@ const Home: NextPage = () => {
         }));
 
         setProductsWithPrices(updatedProducts);
-        console.log("updatedProducts:", updatedProducts);
       } catch (error) {
         console.error("Failed to fetch prices:", error);
       }
     };
 
     fetchPrices();
-  }, [publicClient, voucherContractInfo, isMember, tokenIds]);
+  }, [publicClient, voucherContractInfo, isMember]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -250,7 +241,7 @@ const Home: NextPage = () => {
           {/* Tab Contents */}
           <TabsContent value="points" className="p-4 mt-0">
             <PointMall
-              products={mockPointProducts}
+              products={productsWithPrices}
               refetchFunc={() => {
                 refetchPointsBalance();
                 refetchMyProductsData();

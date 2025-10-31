@@ -6,7 +6,6 @@ export const mockUSDCProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/food/food1.jpg",
-    value: 0.001,
   },
   {
     id: 100101,
@@ -14,7 +13,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
-    value: 0.002,
   },
   {
     id: 100102,
@@ -22,7 +20,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food3.jpg",
-    value: 0.003,
   },
   {
     id: 100103,
@@ -30,7 +27,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food4.jpg",
-    value: 0.004,
   },
   {
     id: 100104,
@@ -38,7 +34,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food5.jpg",
-    value: 0.005,
   },
   {
     id: 100300,
@@ -46,7 +41,6 @@ export const mockUSDCProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/food/food1.jpg",
-    value: 0.001,
   },
   {
     id: 100301,
@@ -54,7 +48,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
-    value: 0.002,
   },
   {
     id: 100302,
@@ -62,7 +55,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food3.jpg",
-    value: 0.003,
   },
   {
     id: 100303,
@@ -70,7 +62,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food4.jpg",
-    value: 0.004,
   },
   {
     id: 100304,
@@ -78,7 +69,6 @@ export const mockUSDCProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food5.jpg",
-    value: 0.005,
   },
 ];
 
@@ -89,7 +79,6 @@ export const mockPointProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/candy/candy1.jpg",
-    value: 0.001,
   },
   {
     id: 100201,
@@ -97,7 +86,6 @@ export const mockPointProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy2.jpg",
-    value: 0.002,
   },
   {
     id: 100202,
@@ -105,7 +93,6 @@ export const mockPointProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy3.jpg",
-    value: 0.003,
   },
   {
     id: 100203,
@@ -113,7 +100,6 @@ export const mockPointProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy4.jpg",
-    value: 0.004,
   },
   {
     id: 100204,
@@ -121,7 +107,6 @@ export const mockPointProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy5.png",
-    value: 0.005,
   },
 ];
 
@@ -134,7 +119,6 @@ export const mockProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/food/food1.jpg",
-    value: 0.001,
   },
   {
     id: 100101,
@@ -142,7 +126,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
-    value: 0.002,
   },
   {
     id: 100102,
@@ -150,7 +133,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food3.jpg",
-    value: 0.003,
   },
   {
     id: 100103,
@@ -158,7 +140,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food4.jpg",
-    value: 0.004,
   },
   {
     id: 100104,
@@ -166,7 +147,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food5.jpg",
-    value: 0.005,
   },
   {
     id: 100200,
@@ -174,7 +154,6 @@ export const mockProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/candy/candy1.jpg",
-    value: 0.001,
   },
   {
     id: 100201,
@@ -182,7 +161,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy2.jpg",
-    value: 0.002,
   },
   {
     id: 100202,
@@ -190,7 +168,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy3.jpg",
-    value: 0.003,
   },
   {
     id: 100203,
@@ -198,7 +175,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy4.jpg",
-    value: 0.004,
   },
   {
     id: 100204,
@@ -206,7 +182,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy5.png",
-    value: 0.005,
   },
   {
     id: 100300,
@@ -214,7 +189,6 @@ export const mockProducts = [
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
     image: "/images/food/food1.jpg",
-    value: 0.001,
   },
   {
     id: 100301,
@@ -222,7 +196,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
-    value: 0.002,
   },
   {
     id: 100302,
@@ -230,7 +203,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food3.jpg",
-    value: 0.003,
   },
   {
     id: 100303,
@@ -238,7 +210,6 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food4.jpg",
-    value: 0.004,
   },
   {
     id: 100304,
@@ -246,6 +217,5 @@ export const mockProducts = [
     brand: "TEXAS ROADHOUSE",
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food5.jpg",
-    value: 0.005,
   },
 ];
