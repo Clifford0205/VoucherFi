@@ -11,7 +11,7 @@ import { mockAllProducts, mockPointProducts, mockProducts, mockUSDCProducts } fr
 import { ProductMall } from "~~/components/ProductMall";
 import { Address } from "~~/components/scaffold-eth";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
-import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
+import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 const tokenIds = mockProducts.map(product => BigInt(product.id));
@@ -21,13 +21,17 @@ const Home: NextPage = () => {
   const publicClient = usePublicClient();
   const [activeTab, setActiveTab] = useState("mall");
   const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
-  console.log("productsWithPrices: ", productsWithPrices);
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [hasAttemptedRegister, setHasAttemptedRegister] = useState(false);
 
   // 獲取合約信息
   const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
 
+  // 準備 register 寫入函數
+  const { writeContractAsync: registerContract } = useScaffoldWriteContract("SimpleVoucher1155");
+
   // 檢查會員狀態：讀取合約中的 NFT 餘額
-  const { data: memberBalance } = useScaffoldReadContract({
+  const { data: memberBalance, refetch: refetchMemberBalance } = useScaffoldReadContract({
     contractName: "SimpleVoucher1155",
     functionName: "balanceOf",
     args: [connectedAddress, 100n],
@@ -37,7 +41,52 @@ const Home: NextPage = () => {
   });
 
   // 判斷是否為會員：餘額大於 0
-  const isMember = memberBalance !== undefined && memberBalance > 0n;
+  const isMember = useMemo(() => memberBalance !== undefined && memberBalance > 0n, [memberBalance]);
+
+  // 要是 isMember false 則去打 SimpleVoucher1155 的 register ABI
+  useEffect(() => {
+    const handleRegister = async () => {
+      // 條件檢查：已連接錢包、不是會員、且未在註冊中、且未嘗試過註冊
+      if (!connectedAddress || isMember || isRegistering || hasAttemptedRegister || memberBalance === undefined) {
+        return;
+      }
+
+      try {
+        setIsRegistering(true);
+        setHasAttemptedRegister(true); // 標記已嘗試註冊
+        console.log("開始註冊會員...");
+
+        // 調用 register 函數
+        await registerContract({
+          functionName: "register",
+        });
+
+        console.log("會員註冊成功！");
+
+        // 註冊成功後重新查詢會員狀態
+        await refetchMemberBalance();
+
+        // 等待一小段時間，讓區塊鏈確認交易和狀態更新
+        setTimeout(() => {
+          setIsRegistering(false);
+        }, 2000);
+      } catch (error) {
+        console.error("會員註冊失敗:", error);
+        setIsRegistering(false);
+        // 註冊失敗不重置 hasAttemptedRegister，避免重複嘗試
+      }
+    };
+
+    handleRegister();
+  }, [
+    connectedAddress,
+    isMember,
+    memberBalance,
+    isRegistering,
+    hasAttemptedRegister,
+    registerContract,
+    refetchMemberBalance,
+  ]);
 
   // 創建相同長度的 accounts 數組，每個都是 connectedAddress
   const accounts = connectedAddress ? Array(tokenIds.length).fill(connectedAddress) : [];
@@ -202,7 +251,7 @@ const Home: NextPage = () => {
                 activeTab === "points" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">點數商城</div>
+              <div className="text-3xl font-bold text-white">點數兌換</div>
             </button>
 
             <button
@@ -219,15 +268,7 @@ const Home: NextPage = () => {
                 activeTab === "mall" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-8 h-8 mx-auto text-white"
-              >
-                <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.558 9.592a3.752 3.752 0 00-2.806 3.63c0 .414.336.75.75.75h15.75a.75.75 0 000-1.5H5.378A2.25 2.25 0 017.5 15h11.218a.75.75 0 00.674-.421 60.358 60.358 0 002.96-7.228.75.75 0 00-.525-.965A60.864 60.864 0 005.68 4.509l-.232-.867A1.875 1.875 0 003.636 2.25H2.25zM3.75 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0zM16.5 20.25a1.5 1.5 0 113 0 1.5 1.5 0 01-3 0z" />
-              </svg>
-              <div className="text-xs mt-1 text-white/80">商城</div>
+              <div className="text-3xl font-bold text-white">商城</div>
             </button>
           </div>
         )}
