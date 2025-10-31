@@ -8,6 +8,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
 import { mockProducts } from "~/lib/mockProducts";
+import { Member } from "~~/components/Member";
 import { ProductMall } from "~~/components/ProductMall";
 import { Address } from "~~/components/scaffold-eth";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
@@ -246,14 +247,14 @@ const Home: NextPage = () => {
 
         {/* Tab Navigation Cards */}
         {connectedAddress && isMember && (
-          <div className="relative z-10 grid grid-cols-3 gap-3 px-4 mt-6">
+          <div className="relative z-10 grid grid-cols-4 gap-3 px-4 mt-6">
             <button
               onClick={() => setActiveTab("points")}
               className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
                 activeTab === "points" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-lg font-bold text-white">點數兌換</div>
+              <div className="text-sm font-bold text-white">點數兌換</div>
             </button>
 
             <button
@@ -262,7 +263,7 @@ const Home: NextPage = () => {
                 activeTab === "myTickets" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-lg font-bold text-white">我的票券</div>
+              <div className="text-sm font-bold text-white">我的票券</div>
             </button>
             <button
               onClick={() => setActiveTab("mall")}
@@ -270,7 +271,15 @@ const Home: NextPage = () => {
                 activeTab === "mall" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-lg font-bold text-white">商城</div>
+              <div className="text-sm font-bold text-white">商城</div>
+            </button>
+            <button
+              onClick={() => setActiveTab("member")}
+              className={`bg-white/10 backdrop-blur border border-white/20 rounded-lg p-4 text-center transition-all hover:bg-white/20 ${
+                activeTab === "member" ? "ring-2 ring-white/50 bg-white/20" : ""
+              }`}
+            >
+              <div className="text-sm font-bold text-white">會員中心</div>
             </button>
           </div>
         )}
@@ -311,6 +320,10 @@ const Home: NextPage = () => {
                 refetchMyProductsData();
               }}
             />
+          </TabsContent>
+
+          <TabsContent value="member" className="p-4 mt-0">
+            <Member memberBalance={memberBalance} />
           </TabsContent>
         </Tabs>
       )}

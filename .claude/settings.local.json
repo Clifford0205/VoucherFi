@@ -3,7 +3,8 @@
     "allow": [
       "Bash(npx shadcn@latest add card tabs avatar badge)",
       "Bash(yarn next:format:*)",
-      "Bash(npx shadcn@latest add:*)"
+      "Bash(npx shadcn@latest add:*)",
+      "mcp__serena__think_about_collected_information"
     ],
     "deny": [],
     "ask": []
