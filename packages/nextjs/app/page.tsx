@@ -7,7 +7,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
-import { mockAllProducts, mockPointProducts, mockProducts, mockUSDCProducts } from "~/lib/mockProducts";
+import { mockProducts } from "~/lib/mockProducts";
 import { ProductMall } from "~~/components/ProductMall";
 import { Address } from "~~/components/scaffold-eth";
 import { BlockieAvatar } from "~~/components/scaffold-eth";
@@ -132,10 +132,10 @@ const Home: NextPage = () => {
       )
     : {};
 
-  // 從 mockAllProducts 中找到有餘額的商品，並添加 quantity 欄位
+  // 從 mockProducts 中找到有餘額的商品，並添加 quantity 欄位
   const myProductsWithQuantity = Object.keys(productsBalanceMap)
     .map(tokenId => {
-      const product = mockAllProducts.find(p => p.id.toString() === tokenId);
+      const product = mockProducts.find(p => p.id.toString() === tokenId);
       if (product) {
         return {
           ...product,
