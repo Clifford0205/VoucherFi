@@ -16,6 +16,8 @@ interface Product {
   image: string;
   value: number;
   quantity: number;
+  priceUSDC?: number;
+  pointsCost?: number;
 }
 
 interface MyTicketsContentProps {

@@ -14,6 +14,8 @@ interface Product {
   description: string;
   image: string;
   value: number;
+  priceUSDC?: number;
+  pointsCost?: number;
 }
 
 interface PointMallContentProps {

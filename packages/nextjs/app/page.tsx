@@ -269,7 +269,7 @@ const Home: NextPage = () => {
 
           <TabsContent value="mall" className="mt-0">
             <USDCMall
-              products={mockUSDCProducts}
+              products={productsWithPrices}
               refetchFunc={() => {
                 refetchUSDCBalance();
                 refetchMyProductsData();
