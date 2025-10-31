@@ -19,7 +19,7 @@ const tokenIds = mockProducts.map(product => BigInt(product.id));
 const Home: NextPage = () => {
   const { address: connectedAddress } = useAccount();
   const publicClient = usePublicClient();
-  const [activeTab, setActiveTab] = useState("mall");
+  const [activeTab, setActiveTab] = useState("myTickets");
   const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
   console.log("productsWithPrices: ", productsWithPrices);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -302,7 +302,7 @@ const Home: NextPage = () => {
             />
           </TabsContent>
 
-          <TabsContent value="mall" className="mt-0">
+          <TabsContent value="mall" className="p-4 mt-0">
             <ProductMall
               type="usdc"
               products={productsWithPrices}

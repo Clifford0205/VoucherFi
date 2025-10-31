@@ -254,7 +254,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
                     <CardContent className="p-0">
                       {/* Title at the top */}
                       <div className="px-4 pt-4 pb-2 text-center">
-                        <h3 className="text-xl font-bold text-foreground">{product.title}</h3>
+                        <h3 className="text-xl font-bold text-foreground truncate">{product.title}</h3>
                         <p className="text-xs text-muted-foreground mt-1">{product.brand}</p>
                       </div>
 
