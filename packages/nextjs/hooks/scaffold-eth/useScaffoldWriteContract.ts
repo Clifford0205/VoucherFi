@@ -89,6 +89,7 @@ export function useScaffoldWriteContract<TContractName extends ContractName>(
   >(
     variables: ScaffoldWriteContractVariables<TContractName, TFunctionName>,
     options?: ScaffoldWriteContractOptions,
+    overRideMessage?: string,
   ) => {
     if (!deployedContractData) {
       notification.error("Target Contract is not deployed, did you forget to run `yarn deploy`?");
@@ -135,7 +136,11 @@ export function useScaffoldWriteContract<TContractName extends ContractName>(
               >
             | undefined,
         );
-      const writeTxResult = await writeTx(makeWriteWithParams, { blockConfirmations, onBlockConfirmation });
+      const writeTxResult = await writeTx(
+        makeWriteWithParams,
+        { blockConfirmations, onBlockConfirmation },
+        overRideMessage,
+      );
 
       return writeTxResult;
     } catch (e: any) {

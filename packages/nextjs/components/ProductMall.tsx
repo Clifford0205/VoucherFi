@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { keccak256, parseUnits, stringToHex } from "viem";
+import { keccak256, stringToHex } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
@@ -54,6 +54,7 @@ const groupProductsByCategory = (products: Product[]) => {
 };
 
 export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) => {
+  console.log("products: ", products);
   const { address: connectedAddress } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync: writeVoucherContract } = useScaffoldWriteContract("SimpleVoucher1155");
@@ -139,10 +140,14 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
       console.log("Allowance insufficient, approving...");
 
       // 先 approve
-      await writeUSDCContract({
-        functionName: "approve",
-        args: [voucherContractInfo.address, requiredAmount],
-      });
+      await writeUSDCContract(
+        {
+          functionName: "approve",
+          args: [voucherContractInfo.address, requiredAmount],
+        },
+        undefined,
+        "授權成功",
+      );
 
       console.log("Approve transaction confirmed!");
 
@@ -164,20 +169,28 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
     }
 
     // 執行購買
-    await writeVoucherContract({
-      functionName: "mintByUSDC",
-      args: [BigInt(selectedProduct.id), 1n],
-    });
+    await writeVoucherContract(
+      {
+        functionName: "mintByUSDC",
+        args: [BigInt(selectedProduct.id), 1n],
+      },
+      undefined,
+      "購買成功",
+    );
   };
 
   // 點數購買邏輯
   const handlePointsPurchase = async () => {
     if (!selectedProduct) return;
 
-    await writeVoucherContract({
-      functionName: "mintByPoints",
-      args: [BigInt(selectedProduct.id), 1n],
-    });
+    await writeVoucherContract(
+      {
+        functionName: "mintByPoints",
+        args: [BigInt(selectedProduct.id), 1n],
+      },
+      undefined,
+      "兌換成功",
+    );
   };
 
   // 票券使用邏輯
@@ -187,10 +200,14 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
     const timestamp = Date.now();
     const qr = keccak256(stringToHex(`qr-demo-${timestamp}`));
 
-    await writeVoucherContract({
-      functionName: "redeem",
-      args: [BigInt(selectedProduct.id), 1n, qr],
-    });
+    await writeVoucherContract(
+      {
+        functionName: "redeem",
+        args: [BigInt(selectedProduct.id), 1n, qr],
+      },
+      undefined,
+      "兌換成功",
+    );
   };
 
   // 根據類型獲取價格標籤和值

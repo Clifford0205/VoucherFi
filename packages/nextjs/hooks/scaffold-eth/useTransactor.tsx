@@ -10,6 +10,7 @@ import { TransactorFuncOptions, getParsedErrorWithAllAbis } from "~~/utils/scaff
 type TransactionFunc = (
   tx: (() => Promise<Hash>) | Parameters<SendTransactionMutate<Config, undefined>>[0],
   options?: TransactorFuncOptions,
+  overRideMessage?: string,
 ) => Promise<Hash | undefined>;
 
 /**
@@ -40,7 +41,7 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
     walletClient = data;
   }
 
-  const result: TransactionFunc = async (tx, options) => {
+  const result: TransactionFunc = async (tx, options, overRideMessage) => {
     if (!walletClient) {
       notification.error("Cannot access account");
       console.error("⚡️ ~ file: useTransactor.tsx ~ error");
@@ -84,7 +85,10 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
       if (transactionReceipt.status === "reverted") throw new Error("Transaction reverted");
 
       notification.success(
-        <TxnNotification message="Transaction completed successfully!" blockExplorerLink={blockExplorerTxURL} />,
+        <TxnNotification
+          message={overRideMessage || "Transaction completed successfully!"}
+          blockExplorerLink={blockExplorerTxURL}
+        />,
         {
           icon: "🎉",
           duration: 5000,
