@@ -29,6 +29,30 @@ interface ProductMallProps {
   type: MallType;
 }
 
+// 根據 productId 獲取分類
+const getProductCategory = (productId: number): string => {
+  const idString = productId.toString();
+  if (idString.startsWith("1001")) return "美食";
+  if (idString.startsWith("1002")) return "住宿";
+  if (idString.startsWith("1003")) return "旅行";
+  return "其他";
+};
+
+// 將產品按分類分組
+const groupProductsByCategory = (products: Product[]) => {
+  const grouped: Record<string, Product[]> = {};
+
+  products.forEach(product => {
+    const category = getProductCategory(product.id);
+    if (!grouped[category]) {
+      grouped[category] = [];
+    }
+    grouped[category].push(product);
+  });
+
+  return grouped;
+};
+
 export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) => {
   const { address: connectedAddress } = useAccount();
   const publicClient = usePublicClient();
@@ -36,6 +60,9 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
   const { writeContractAsync: writeUSDCContract } = useScaffoldWriteContract("mockUSDC");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  // 將產品按分類分組
+  const groupedProducts = groupProductsByCategory(products);
 
   // 獲取合約信息（只在 USDC 類型時需要）
   const { data: voucherContractInfo } = useDeployedContractInfo("SimpleVoucher1155");
@@ -204,64 +231,76 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
 
   return (
     <>
-      <div className="p-4 mt-0 grid grid-cols-2 gap-4 max-w-7xl mx-auto">
-        {products.map(product => {
-          const priceInfo = getPriceInfo(product);
+      <div className="p-4 mt-0 max-w-7xl mx-auto space-y-8">
+        {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
+          <div key={category}>
+            {/* 分類標題 */}
+            <h2 className="text-2xl font-bold mb-4 px-2 text-foreground ">{category}</h2>
 
-          return (
-            <Card
-              key={product.id}
-              onClick={() => handleProductClick(product)}
-              className="w-full overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-0"
-              style={{ backgroundColor: "#F4F5F8" }}
-            >
-              <CardContent className="p-0">
-                {/* Title at the top */}
-                <div className="px-4 pt-4 pb-2 text-center">
-                  <h3 className="text-xl font-bold text-foreground">{product.title}</h3>
-                  <p className="text-xs text-muted-foreground mt-1">{product.brand}</p>
-                </div>
+            {/* 該分類的產品網格 */}
+            <div className="grid grid-cols-2 gap-4">
+              {categoryProducts.map(product => {
+                const priceInfo = getPriceInfo(product);
 
-                {/* Image and Description Container with Padding */}
-                <div className="px-4 pb-4">
-                  <div className="flex flex-col gap-3">
-                    {/* Image Section */}
-                    <div className="relative w-full h-[180px] rounded-lg overflow-hidden">
-                      <Image
-                        src={product.image}
-                        alt={product.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 50vw"
-                      />
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="flex flex-col gap-2">
-                      <div>
-                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-2">
-                          {product.description}
-                        </p>
+                return (
+                  <Card
+                    key={product.id}
+                    onClick={() => handleProductClick(product)}
+                    className="w-full overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-0"
+                    style={{ backgroundColor: "#F4F5F8" }}
+                  >
+                    <CardContent className="p-0">
+                      {/* Title at the top */}
+                      <div className="px-4 pt-4 pb-2 text-center">
+                        <h3 className="text-xl font-bold text-foreground">{product.title}</h3>
+                        <p className="text-xs text-muted-foreground mt-1">{product.brand}</p>
                       </div>
 
-                      {/* Price Section */}
-                      <div className="flex items-end justify-between pt-2 border-t">
-                        <div className="text-xs text-muted-foreground">{priceInfo.label}</div>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-foreground">
-                            {priceInfo.value}
-                            {type === "tickets" && ` ${priceInfo.unit}`}
+                      {/* Image and Description Container with Padding */}
+                      <div className="px-4 pb-4">
+                        <div className="flex flex-col gap-3">
+                          {/* Image Section */}
+                          <div className="relative w-full h-[180px] rounded-lg overflow-hidden">
+                            <Image
+                              src={product.image}
+                              alt={product.title}
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 50vw"
+                            />
                           </div>
-                          {type !== "tickets" && <div className="text-xs text-muted-foreground">{priceInfo.unit}</div>}
+
+                          {/* Content Section */}
+                          <div className="flex flex-col gap-2">
+                            <div>
+                              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-2">
+                                {product.description}
+                              </p>
+                            </div>
+
+                            {/* Price Section */}
+                            <div className="flex items-end justify-between pt-2 border-t">
+                              <div className="text-xs text-muted-foreground">{priceInfo.label}</div>
+                              <div className="text-right">
+                                <div className="text-2xl font-bold text-foreground">
+                                  {priceInfo.value}
+                                  {type === "tickets" && ` ${priceInfo.unit}`}
+                                </div>
+                                {type !== "tickets" && (
+                                  <div className="text-xs text-muted-foreground">{priceInfo.unit}</div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Product Detail Dialog */}
