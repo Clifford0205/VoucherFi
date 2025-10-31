@@ -15,7 +15,6 @@ interface Product {
   brand: string;
   description: string;
   image: string;
-  value: number;
   priceUSDC?: number;
   pointsCost?: number;
 }

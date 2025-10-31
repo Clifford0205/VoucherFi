@@ -14,7 +14,6 @@ interface Product {
   brand: string;
   description: string;
   image: string;
-  value: number;
   quantity: number;
   priceUSDC?: number;
   pointsCost?: number;
@@ -106,14 +105,9 @@ export const MyTickets = ({ products, refetchFunc }: MyTicketsContentProps) => {
                       <div className="text-sm text-muted-foreground">數量</div>
 
                       <div className="text-right">
-                        {product.quantity ? (
+                        {product.quantity && (
                           <div>
                             <div className="text-3xl font-bold text-foreground">{product.quantity} 張</div>
-                          </div>
-                        ) : (
-                          <div>
-                            <div className="text-3xl font-bold text-foreground">{product.value}</div>
-                            <div className="text-sm text-muted-foreground">ETH</div>
                           </div>
                         )}
                       </div>
