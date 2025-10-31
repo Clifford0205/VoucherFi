@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { keccak256, stringToHex } from "viem";
+import { keccak256, parseUnits, stringToHex } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
