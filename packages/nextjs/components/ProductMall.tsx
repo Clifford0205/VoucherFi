@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import { keccak256, parseUnits, stringToHex } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
@@ -54,13 +54,17 @@ const groupProductsByCategory = (products: Product[]) => {
 };
 
 export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) => {
-  console.log("products: ", products);
   const { address: connectedAddress } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync: writeVoucherContract } = useScaffoldWriteContract("SimpleVoucher1155");
   const { writeContractAsync: writeUSDCContract } = useScaffoldWriteContract("mockUSDC");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const totalQuantity = useMemo(() => {
+    if (type !== "tickets") return 0;
+    return products.reduce((acc, product) => acc + (product.quantity || 0), 0);
+  }, [products, type]);
 
   // 將產品按分類分組
   const groupedProducts = groupProductsByCategory(products);
@@ -249,6 +253,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
   return (
     <>
       <div className="p-4 mt-0 max-w-7xl mx-auto space-y-8">
+        {type === "tickets" && <div className="text-center font-bold text-xl">現在總共有{totalQuantity}張票券</div>}
         {Object.entries(groupedProducts).map(([category, categoryProducts]) => (
           <div key={category}>
             {/* 分類標題 */}
