@@ -21,7 +21,6 @@ const Home: NextPage = () => {
   const publicClient = usePublicClient();
   const [activeTab, setActiveTab] = useState("myTickets");
   const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
-  console.log("productsWithPrices: ", productsWithPrices);
   const [isRegistering, setIsRegistering] = useState(false);
   const [hasAttemptedRegister, setHasAttemptedRegister] = useState(false);
 
@@ -223,10 +222,10 @@ const Home: NextPage = () => {
                   <Address address={connectedAddress} isBlockieShow={false} />
                 </div>
               </div>
-              <div className="text-2xl font-bold">
+              <div className="text-lg font-bold mt-2">
                 USDC: {usdcBalance ? (Number(usdcBalance) / 1000000).toFixed(2) : "0.00"}
               </div>
-              <div className="text-2xl font-bold">Points: {pointsBalance}</div>
+              <div className="text-lg font-bold mt-2">Points: {pointsBalance}</div>
 
               {/* Member Badge */}
               {/* <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">

@@ -14,6 +14,7 @@ interface Product {
   image: string;
   priceUSDC?: number;
   pointsCost?: number;
+  quantity?: number;
 }
 
 interface ProductDialogProps {
@@ -79,32 +80,43 @@ export const ProductDialog = ({
               <p className="text-sm sm:text-base text-muted-foreground whitespace-pre-line">{product.description}</p>
             </div>
 
-            <div className="flex items-center justify-between p-3 sm:p-4 bg-muted/50 rounded-lg">
+            <div className="mt-4">
               {type === "points" && (
-                <>
-                  <span className="text-base sm:text-lg font-semibold">點數</span>
+                <div className="flex items-start justify-between">
+                  <span className="font-black">點數</span>
                   <div className="text-right">
-                    <>
+                    <div className="flex items-baseline">
                       <div className="text-2xl sm:text-3xl font-bold">
                         {product.pointsCost !== undefined ? product.pointsCost : "0"}
                       </div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">Point</div>
-                    </>
+                      <div className="text-xs sm:text-sm text-muted-foreground ml-1">Point</div>
+                    </div>
                   </div>
-                </>
+                </div>
               )}
               {type === "usdc" && (
-                <>
-                  <span className="text-base sm:text-lg font-semibold">價格</span>
+                <div className="flex items-start justify-between">
+                  <div className="font-black">價格</div>
                   <div className="text-right">
-                    <>
+                    <div className="flex items-baseline">
                       <div className="text-2xl sm:text-3xl font-bold">
                         {product.priceUSDC !== undefined ? (product.priceUSDC / 1000000).toFixed(2) : "0"}
                       </div>
-                      <div className="text-xs sm:text-sm text-muted-foreground">USDC</div>
-                    </>
+                      <div className="text-xs sm:text-sm text-muted-foreground ml-1">USDC</div>
+                    </div>
                   </div>
-                </>
+                </div>
+              )}
+              {type === "use" && (
+                <div className="flex items-start justify-between">
+                  <div className="font-black">剩餘張數</div>
+                  <div className="text-right">
+                    <div className="flex items-baseline">
+                      <div className="text-2xl sm:text-3xl font-bold">{product.quantity}</div>
+                      <div className="text-xs sm:text-sm text-muted-foreground ml-1">張</div>
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           </div>

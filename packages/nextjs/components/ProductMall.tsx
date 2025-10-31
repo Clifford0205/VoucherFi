@@ -253,7 +253,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
                   >
                     <CardContent className="p-0">
                       {/* Title at the top */}
-                      <div className="px-4 pt-4 pb-2 text-center">
+                      <div className="px-4 pt-4 pb-0 text-center">
                         <h3 className="text-xl font-bold text-foreground truncate">{product.title}</h3>
                         <p className="text-xs text-muted-foreground mt-1">{product.brand}</p>
                       </div>
@@ -275,22 +275,17 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
                           {/* Content Section */}
                           <div className="flex flex-col gap-2">
                             <div>
-                              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-2">
+                              <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-2 m-1">
                                 {product.description}
                               </p>
                             </div>
 
                             {/* Price Section */}
-                            <div className="flex items-end justify-between pt-2 border-t">
+                            <div className="flex items-start justify-between pt-2 border-t">
                               <div className="text-xs text-muted-foreground">{priceInfo.label}</div>
-                              <div className="text-right">
-                                <div className="text-2xl font-bold text-foreground">
-                                  {priceInfo.value}
-                                  {type === "tickets" && ` ${priceInfo.unit}`}
-                                </div>
-                                {type !== "tickets" && (
-                                  <div className="text-xs text-muted-foreground">{priceInfo.unit}</div>
-                                )}
+                              <div className="text-right flex items-baseline">
+                                <div className="text-2xl font-bold text-foreground">{priceInfo.value}</div>
+                                <div className="text-xs text-muted-foreground ml-1">{priceInfo.unit}</div>
                               </div>
                             </div>
                           </div>

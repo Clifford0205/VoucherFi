@@ -8,7 +8,7 @@ export const mockProducts = [
   },
   {
     id: 100101,
-    title: "肯德基 咔啦脆雞+小份香酥脆薯",
+    title: "肯德基 咔啦脆雞",
     brand: "肯德基",
     description: "肯德基 咔啦脆雞+小份香酥脆薯(好禮即享券)",
     image: "/images/live/eat2.webp",
@@ -16,14 +16,14 @@ export const mockProducts = [
 
   {
     id: 100103,
-    title: "夏慕尼 新香榭鐵板套餐券4張",
+    title: "夏慕尼 新香榭鐵板燒",
     brand: "王品集團",
     description: "夏慕尼 新香榭鐵板套餐券4張(美食餐券) 限時快閃",
     image: "/images/live/eat3.webp",
   },
   {
     id: 100104,
-    title: "西堤牛排 經典套餐$768",
+    title: "西堤牛排 經典套餐",
     brand: "王品集團",
     description: "西堤牛排 經典套餐$768(好禮即享券)",
     image: "/images/live/eat4.webp",
