@@ -118,7 +118,7 @@ export const mockProducts = [
     title: "炒飯",
     brand: "TGI FRIDAYS",
     description: "消費滿1,200元免費享用沙朗牛排",
-    image: "/images/food/food1.jpg",
+    image: "/images/food/food1.webp",
   },
   {
     id: 100101,
@@ -127,13 +127,7 @@ export const mockProducts = [
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
   },
-  {
-    id: 100102,
-    title: "咖哩",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food3.jpg",
-  },
+
   {
     id: 100103,
     title: "蕃茄咖喱",
@@ -162,13 +156,7 @@ export const mockProducts = [
     description: "消費滿$1,200立即兌換",
     image: "/images/candy/candy2.jpg",
   },
-  {
-    id: 100202,
-    title: "糖果3",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/candy/candy3.jpg",
-  },
+
   {
     id: 100203,
     title: "糖果4",
@@ -197,13 +185,7 @@ export const mockProducts = [
     description: "消費滿$1,200立即兌換",
     image: "/images/food/food2.jpg",
   },
-  {
-    id: 100302,
-    title: "咖哩",
-    brand: "TEXAS ROADHOUSE",
-    description: "消費滿$1,200立即兌換",
-    image: "/images/food/food3.jpg",
-  },
+
   {
     id: 100303,
     title: "蕃茄咖喱",

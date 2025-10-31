@@ -21,6 +21,7 @@ const Home: NextPage = () => {
   const publicClient = usePublicClient();
   const [activeTab, setActiveTab] = useState("mall");
   const [productsWithPrices, setProductsWithPrices] = useState(mockProducts);
+  console.log("productsWithPrices: ", productsWithPrices);
   const [isRegistering, setIsRegistering] = useState(false);
   const [hasAttemptedRegister, setHasAttemptedRegister] = useState(false);
 
@@ -222,8 +223,10 @@ const Home: NextPage = () => {
                   <Address address={connectedAddress} isBlockieShow={false} />
                 </div>
               </div>
-              <div>USDC: {usdcBalance}</div>
-              <div>Points: {pointsBalance}</div>
+              <div className="text-2xl font-bold">
+                USDC: {usdcBalance ? (Number(usdcBalance) / 1000000).toFixed(2) : "0.00"}
+              </div>
+              <div className="text-2xl font-bold">Points: {pointsBalance}</div>
 
               {/* Member Badge */}
               {/* <Badge variant="secondary" className="mt-2 bg-white/20 hover:bg-white/30 text-white border-0">
@@ -251,7 +254,7 @@ const Home: NextPage = () => {
                 activeTab === "points" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">點數兌換</div>
+              <div className="text-lg font-bold text-white">點數兌換</div>
             </button>
 
             <button
@@ -260,7 +263,7 @@ const Home: NextPage = () => {
                 activeTab === "myTickets" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">我的票券</div>
+              <div className="text-lg font-bold text-white">我的票券</div>
             </button>
             <button
               onClick={() => setActiveTab("mall")}
@@ -268,7 +271,7 @@ const Home: NextPage = () => {
                 activeTab === "mall" ? "ring-2 ring-white/50 bg-white/20" : ""
               }`}
             >
-              <div className="text-3xl font-bold text-white">商城</div>
+              <div className="text-lg font-bold text-white">商城</div>
             </button>
           </div>
         )}

@@ -204,7 +204,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
 
   return (
     <>
-      <div className="p-4 mt-0 flex flex-col items-center space-y-6">
+      <div className="p-4 mt-0 grid grid-cols-2 gap-4 max-w-7xl mx-auto">
         {products.map(product => {
           const priceInfo = getPriceInfo(product);
 
@@ -212,49 +212,47 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
             <Card
               key={product.id}
               onClick={() => handleProductClick(product)}
-              className="w-full max-w-[60%] overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-0"
+              className="w-full overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-0"
               style={{ backgroundColor: "#F4F5F8" }}
             >
               <CardContent className="p-0">
                 {/* Title at the top */}
-                <div className="px-6 pt-6 pb-3 text-center">
-                  <h3 className="text-2xl font-bold text-foreground">{product.title}</h3>
-                  <p className="text-sm text-muted-foreground mt-1">{product.brand}</p>
+                <div className="px-4 pt-4 pb-2 text-center">
+                  <h3 className="text-xl font-bold text-foreground">{product.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1">{product.brand}</p>
                 </div>
 
                 {/* Image and Description Container with Padding */}
-                <div className="px-6 pb-6">
-                  <div className="flex flex-row gap-4">
-                    {/* Left: Image Section */}
-                    <div className="relative w-2/5 min-h-[200px] rounded-lg overflow-hidden">
+                <div className="px-4 pb-4">
+                  <div className="flex flex-col gap-3">
+                    {/* Image Section */}
+                    <div className="relative w-full h-[180px] rounded-lg overflow-hidden">
                       <Image
                         src={product.image}
                         alt={product.title}
                         fill
                         className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 40vw"
+                        sizes="(max-width: 768px) 100vw, 50vw"
                       />
                     </div>
 
-                    {/* Right: Content Section */}
-                    <div className="flex-1 flex flex-col justify-between">
+                    {/* Content Section */}
+                    <div className="flex flex-col gap-2">
                       <div>
-                        <p className="text-base text-muted-foreground leading-relaxed whitespace-pre-line">
+                        <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line line-clamp-2">
                           {product.description}
                         </p>
                       </div>
 
                       {/* Price Section */}
-                      <div className="flex items-end justify-between mt-4 pt-4">
-                        <div className="text-sm text-muted-foreground">{priceInfo.label}</div>
+                      <div className="flex items-end justify-between pt-2 border-t">
+                        <div className="text-xs text-muted-foreground">{priceInfo.label}</div>
                         <div className="text-right">
-                          <div className="text-3xl font-bold text-foreground">
+                          <div className="text-2xl font-bold text-foreground">
                             {priceInfo.value}
                             {type === "tickets" && ` ${priceInfo.unit}`}
                           </div>
-                          {type !== "tickets" && (
-                            <div className="text-sm text-muted-foreground">{priceInfo.unit}</div>
-                          )}
+                          {type !== "tickets" && <div className="text-xs text-muted-foreground">{priceInfo.unit}</div>}
                         </div>
                       </div>
                     </div>

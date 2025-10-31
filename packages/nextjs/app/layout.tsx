@@ -12,7 +12,8 @@ export const metadata = getMetadata({
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
   return (
     <html suppressHydrationWarning>
-      <body>
+      {/* 最大寬度 900px */}
+      <body className="max-w-[450px]  mx-auto">
         <ThemeProvider enableSystem={false} defaultTheme="light" forcedTheme="light">
           <ScaffoldEthAppWithProviders>{children}</ScaffoldEthAppWithProviders>
         </ThemeProvider>
