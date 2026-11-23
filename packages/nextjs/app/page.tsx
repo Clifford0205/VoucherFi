@@ -7,6 +7,7 @@ import { useAccount, usePublicClient } from "wagmi";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { Badge } from "~/components/ui/badge";
 import { Tabs, TabsContent } from "~/components/ui/tabs";
+import { getFeeOverrides } from "~/lib/getFeeOverrides";
 import { mockProducts } from "~/lib/mockProducts";
 import { Member } from "~~/components/Member";
 import { ProductMall } from "~~/components/ProductMall";
@@ -60,6 +61,7 @@ const Home: NextPage = () => {
         // 調用 register 函數
         await registerContract({
           functionName: "register",
+          ...(await getFeeOverrides(publicClient)),
         });
 
         console.log("會員註冊成功！");
@@ -87,6 +89,7 @@ const Home: NextPage = () => {
     hasAttemptedRegister,
     registerContract,
     refetchMemberBalance,
+    publicClient,
   ]);
 
   // 創建相同長度的 accounts 數組，每個都是 connectedAddress

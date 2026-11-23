@@ -6,6 +6,7 @@ import { keccak256, stringToHex } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
+import { getFeeOverrides } from "~/lib/getFeeOverrides";
 import { useScaffoldReadContract, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
@@ -149,6 +150,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
         {
           functionName: "approve",
           args: [voucherContractInfo.address, requiredAmount],
+          ...(await getFeeOverrides(publicClient)),
         },
         undefined,
         "授權成功",
@@ -178,6 +180,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
       {
         functionName: "mintByUSDC",
         args: [BigInt(selectedProduct.id), 1n],
+        ...(await getFeeOverrides(publicClient)),
       },
       undefined,
       "購買成功",
@@ -192,6 +195,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
       {
         functionName: "mintByPoints",
         args: [BigInt(selectedProduct.id), 1n],
+        ...(await getFeeOverrides(publicClient)),
       },
       undefined,
       "兌換成功",
@@ -209,6 +213,7 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
       {
         functionName: "redeem",
         args: [BigInt(selectedProduct.id), 1n, qr],
+        ...(await getFeeOverrides(publicClient)),
       },
       undefined,
       "兌換成功",

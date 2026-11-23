@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import { keccak256, stringToHex } from "viem";
-import { useAccount } from "wagmi";
+import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
+import { getFeeOverrides } from "~/lib/getFeeOverrides";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 interface Product {
@@ -26,6 +27,7 @@ interface MyTicketsContentProps {
 
 export const MyTickets = ({ products, refetchFunc }: MyTicketsContentProps) => {
   const { address: connectedAddress } = useAccount();
+  const publicClient = usePublicClient();
   const { writeContractAsync } = useScaffoldWriteContract("SimpleVoucher1155");
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -50,6 +52,7 @@ export const MyTickets = ({ products, refetchFunc }: MyTicketsContentProps) => {
       await writeContractAsync({
         functionName: "redeem",
         args: [BigInt(selectedProduct?.id || 0), 1n, qr],
+        ...(await getFeeOverrides(publicClient)),
       });
       console.log("Purchase successful!");
       setIsDialogOpen(false);
