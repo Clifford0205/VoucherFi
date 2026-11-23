@@ -26,6 +26,7 @@ type ScaffoldWriteContractReturnType<TContractName extends ContractName> = Omit<
   >(
     variables: ScaffoldWriteContractVariables<TContractName, TFunctionName>,
     options?: ScaffoldWriteContractOptions,
+    overRideMessage?: string,
   ) => Promise<WriteContractReturnType | undefined>;
   writeContract: <TFunctionName extends ExtractAbiFunctionNames<ContractAbi<TContractName>, "nonpayable" | "payable">>(
     variables: ScaffoldWriteContractVariables<TContractName, TFunctionName>,

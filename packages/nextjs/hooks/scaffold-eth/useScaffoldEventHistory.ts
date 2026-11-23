@@ -11,6 +11,7 @@ import { replacer } from "~~/utils/scaffold-eth/common";
 import {
   ContractAbi,
   ContractName,
+  GenericContract,
   UseScaffoldEventHistoryConfig,
   UseScaffoldEventHistoryData,
 } from "~~/utils/scaffold-eth/contract";
@@ -125,14 +126,10 @@ export const useScaffoldEventHistory = <
 
   const isContractAddressAndClientReady = Boolean(deployedContractData?.address) && Boolean(publicClient);
 
-  const fromBlockValue =
-    fromBlock !== undefined
-      ? fromBlock
-      : BigInt(
-          deployedContractData && "deployedOnBlock" in deployedContractData
-            ? deployedContractData.deployedOnBlock || 0
-            : 0,
-        );
+  // 部分鏈的部署資料沒有 deployedOnBlock（例如 Arbitrum Sepolia），`in` 縮窄後型別會變成 {}，
+  // 改用 GenericContract 讀取可選欄位
+  const deployedOnBlock = (deployedContractData as GenericContract | undefined)?.deployedOnBlock;
+  const fromBlockValue = fromBlock !== undefined ? fromBlock : BigInt(deployedOnBlock || 0);
 
   const query = useInfiniteQuery({
     queryKey: [
