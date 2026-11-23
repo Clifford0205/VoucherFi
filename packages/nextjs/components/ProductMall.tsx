@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import { keccak256, parseUnits, stringToHex } from "viem";
+import { keccak256, stringToHex } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { ProductDialog } from "~/components/ProductDialog";
 import { Card, CardContent } from "~/components/ui/card";
@@ -134,8 +134,8 @@ export const ProductMall = ({ products, refetchFunc, type }: ProductMallProps) =
   const handleUSDCPurchase = async () => {
     if (!voucherContractInfo?.address || !selectedProduct || !connectedAddress) return;
 
-    // 計算需要的 USDC 金額（USDC 有 6 位小數）
-    const requiredAmount = parseUnits(selectedProduct.priceUSDC?.toString() || "0", 6);
+    // priceUSDC 是鏈上讀到的原始值，已含 6 位小數（10 USDC = 10000000），不可再 parseUnits
+    const requiredAmount = BigInt(selectedProduct.priceUSDC ?? 0);
 
     console.log("Required amount:", requiredAmount);
     console.log("Current allowance:", currentAllowance);
