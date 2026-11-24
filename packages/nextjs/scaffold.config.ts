@@ -30,7 +30,7 @@ const scaffoldConfig = {
   // The key is the chain ID, and the value is the HTTP RPC URL
   rpcOverrides: {
     // Example:
-    [chains.arbitrumSepolia.id]: "https://arb-sepolia.g.alchemy.com/v2/3Cjd6dxyWU5xmIPjxGbZxqqEhPVQHJ9I",
+    [chains.arbitrumSepolia.id]: process.env.NEXT_PUBLIC_ARB_SEPOLIA_RPC_URL ?? "",
   },
 
   // This is ours WalletConnect's default project ID.
